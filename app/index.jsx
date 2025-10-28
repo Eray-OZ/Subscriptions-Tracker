@@ -137,10 +137,16 @@ export default function Index() {
                     ) : (
                         <Text style={styles.paymentStatusText}>{remainingDays} days left</Text>
                     )}
-                    <TouchableOpacity style={styles.deleteButton} onPress={() => handleDelete(item.id)}>
-                        <MaterialCommunityIcons name="delete" size={16} color={colors.red400} />
-                        <Text style={styles.deleteButtonText}>Delete</Text>
-                    </TouchableOpacity>
+                    <View style={{ flexDirection: 'row', gap: 8 }}>
+                        <TouchableOpacity style={styles.updateButton} onPress={() => { }}>
+                            <MaterialCommunityIcons name="pencil" size={16} color={colors.primary} />
+                            <Text style={styles.updateButtonText}>Update</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={styles.deleteButton} onPress={() => handleDelete(item.id)}>
+                            <MaterialCommunityIcons name="delete" size={16} color={colors.red400} />
+                            <Text style={styles.deleteButtonText}>Delete</Text>
+                        </TouchableOpacity>
+                    </View>
                 </View>
             </View>
         );
@@ -197,6 +203,9 @@ export default function Index() {
 
             <View style={styles.header}>
                 <Text style={styles.headerTitle}>Subscriptions</Text>
+                <TouchableOpacity style={styles.searchButton}>
+                    <MaterialCommunityIcons name="magnify" size={20} color={colors.slate100} />
+                </TouchableOpacity>
             </View>
 
             <FlatList

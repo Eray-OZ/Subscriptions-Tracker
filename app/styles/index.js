@@ -114,6 +114,20 @@ export const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '600',
   },
+  updateButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: 'rgba(37, 205, 25, 0.1)',
+    borderRadius: 9999,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+  },
+  updateButtonText: {
+    color: colors.primary,
+    fontSize: 12,
+    fontWeight: '600',
+  },
   footer: {
     padding: 16,
     backgroundColor: 'rgba(13, 12, 29, 0.8)',

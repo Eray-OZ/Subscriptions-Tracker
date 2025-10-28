@@ -5,32 +5,13 @@ let db = null;
 
 // 2. Veritabanını kuracak ve db değişkenini dolduracak TEK bir ana fonksiyon oluştur.
 export const setupDatabase = async () => {
-  // Veritabanını aç ve üstteki db değişkenine ata.
   db = await SQLite.openDatabaseAsync('SubTracker');
 
-  // CREATE TABLE ve INSERT komutlarını çalıştır (noktalı virgüllere dikkat).
   await db.execAsync(`
-    CREATE TABLE IF NOT EXISTS Categories (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL);
+    CREATE TABLE IF NOT EXISTS Categories (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL UNIQUE);
     CREATE TABLE IF NOT EXISTS Subscriptions (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, amount REAL NOT NULL, nextPaymentDate DATE NOT NULL, categoryId INTEGER, FOREIGN KEY (categoryId) REFERENCES Categories (id));
     CREATE TABLE IF NOT EXISTS PaymentHistory (id INTEGER PRIMARY KEY AUTOINCREMENT, subscriptionId INTEGER, name TEXT NOT NULL, amount REAL NOT NULL, paymentDate DATE NOT NULL, categoryId INTEGER, FOREIGN KEY(subscriptionId) REFERENCES Subscriptions(id), FOREIGN KEY(categoryId) REFERENCES Categories(id));
-    `);
-
-  const categoryCount = await db.getFirstAsync('SELECT COUNT(*) as count FROM Categories');
-  if (categoryCount && categoryCount.count === 0) {
-    console.log('Categories tablosu boş, başlangıç verileri ekleniyor...');
-    await db.execAsync(`
-        INSERT INTO Categories (name) VALUES ('Bills');
-        INSERT INTO Categories (name) VALUES ('Movie Streaming');
-        INSERT INTO Categories (name) VALUES ('Music');
-        INSERT INTO Categories (name) VALUES ('Gaming');
-        INSERT INTO Categories (name) VALUES ('Software');
-        INSERT INTO Categories (name) VALUES ('Cloud');
-        INSERT INTO Categories (name) VALUES ('Reading');
-        INSERT INTO Categories (name) VALUES ('Shopping');
-        INSERT INTO Categories (name) VALUES ('Gym');
-        INSERT INTO Categories (name) VALUES ('Others');
-    `);
-  }
+  `);
 };
 
 // 3. Diğer tüm fonksiyonlar artık db değişkeninin dolu olduğunu varsayarak çalışabilir.
@@ -44,6 +25,7 @@ export const getSubscriptions = async () => {
     SELECT s.id, s.name, s.amount, s.nextPaymentDate as next_payment_date, c.name as category_name
     FROM Subscriptions s
     JOIN Categories c ON s.categoryId = c.id
+    ORDER BY s.id DESC
   `);
   return allSubs;
 };
@@ -98,6 +80,16 @@ export const updateSubscription = async (subscriptionId, newDate) => {
   return db.runAsync(
     `UPDATE Subscriptions SET nextPaymentDate = (?)
      WHERE id=(?)`, [newDate, subscriptionId]
+  )
+}
+
+
+export const updateAmount = async (subscriptionId, newAmount) => {
+  if (!db) throw new Error("Veritabanı henüz kurulmadı!");
+
+  return db.runAsync(
+    `UPDATE Subscriptions SET amount = (?)
+    WHERE id=(?)`, [newAmount, subscriptionId]
   )
 }
 
