@@ -11,18 +11,18 @@ export const setupDatabase = async () => {
   // CREATE TABLE ve INSERT komutlarını çalıştır (noktalı virgüllere dikkat).
   await db.execAsync(`
     CREATE TABLE IF NOT EXISTS Categories (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL);
-    CREATE TABLE IF NOT EXISTS Subscriptions (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, amount REAL NOT NULL, cycle TEXT NOT NULL, nextPaymentDate TEXT NOT NULL, categoryId INTEGER, FOREIGN KEY (categoryId) REFERENCES Categories (id));
-    CREATE TABLE IF NOT EXISTS PaymentHistory (id INTEGER PRIMARY KEY AUTOINCREMENT, subscriptionId INTEGER, name TEXT NOT NULL, amount REAL NOT NULL, paymentDate TEXT NOT NULL, categoryId INTEGER, FOREIGN KEY(subscriptionId) REFERENCES Subscriptions(id), FOREIGN KEY(categoryId) REFERENCES Categories(id));
-  `);
+    CREATE TABLE IF NOT EXISTS Subscriptions (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, amount REAL NOT NULL, nextPaymentDate DATE NOT NULL, categoryId INTEGER, FOREIGN KEY (categoryId) REFERENCES Categories (id));
+    CREATE TABLE IF NOT EXISTS PaymentHistory (id INTEGER PRIMARY KEY AUTOINCREMENT, subscriptionId INTEGER, name TEXT NOT NULL, amount REAL NOT NULL, paymentDate DATE NOT NULL, categoryId INTEGER, FOREIGN KEY(subscriptionId) REFERENCES Subscriptions(id), FOREIGN KEY(categoryId) REFERENCES Categories(id));
+    `);
 
   const categoryCount = await db.getFirstAsync('SELECT COUNT(*) as count FROM Categories');
   if (categoryCount && categoryCount.count === 0) {
     console.log('Categories tablosu boş, başlangıç verileri ekleniyor...');
     await db.execAsync(`
-        INSERT INTO Categories (name) VALUES ('Fatura');
-        INSERT INTO Categories (name) VALUES ('Eğlence');
-        INSERT INTO Categories (name) VALUES ('Yazılım');
-        INSERT INTO Categories (name) VALUES ('Diğer');
+        INSERT INTO Categories (name) VALUES ('Bills');
+        INSERT INTO Categories (name) VALUES ('Entertainment');
+        INSERT INTO Categories (name) VALUES ('Gym');
+        INSERT INTO Categories (name) VALUES ('Others');
     `);
   }
 };
@@ -34,7 +34,11 @@ export const setupDatabase = async () => {
 // Gerekli SQL: SELECT * FROM Subscriptions ORDER BY ...
 export const getSubscriptions = async () => {
   if (!db) throw new Error("Veritabanı henüz kurulmadı!");
-  const allSubs = await db.getAllAsync('SELECT * FROM Subscriptions');
+  const allSubs = await db.getAllAsync(`
+    SELECT s.id, s.name, s.amount, s.nextPaymentDate as next_payment_date, c.name as category_name
+    FROM Subscriptions s
+    JOIN Categories c ON s.categoryId = c.id
+  `);
   return allSubs;
 };
 
@@ -49,11 +53,11 @@ export const getCategories = async () => {
 // Amaç: Veritabanına yeni bir abonelik eklemek.
 // Parametreler: name, amount, cycle, nextPaymentDate, categoryId
 // Gerekli SQL: INSERT INTO Subscriptions (...) VALUES (...)
-export const addSubscription = async (name, amount, cycle, nextPaymentDate, categoryId) => {
+export const addSubscription = async (name, amount, nextPaymentDate, categoryId) => {
   if (!db) throw new Error("Veritabanı henüz kurulmadı!");
   return await db.runAsync(
-    'INSERT INTO Subscriptions (name, amount, cycle, nextPaymentDate, categoryId) VALUES (?, ?, ?, ?, ?)',
-    [name, amount, cycle, nextPaymentDate, categoryId]
+    'INSERT INTO Subscriptions (name, amount, nextPaymentDate, categoryId) VALUES (?, ?, ?, ?)',
+    [name, amount, nextPaymentDate, categoryId]
   );
 };
 
@@ -68,6 +72,14 @@ export const addPaymentToHistory = async (subscriptionId, name, amount, paymentD
     [subscriptionId, name, amount, paymentDate, categoryId]
   );
 };
+
+
+export const deleteSubscription = async (subscriptionId) => {
+  if (!db) throw new Error("Veritabanı henüz kurulmadı!");
+  return db.runAsync(
+    `DELETE FROM Subscriptions WHERE id=(?)`, [subscriptionId]
+  )
+}
 
 // Fonksiyon: updateSubscription
 // Amaç: Mevcut bir aboneliğin bilgilerini güncellemek.

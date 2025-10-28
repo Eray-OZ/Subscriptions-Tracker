@@ -2,6 +2,7 @@ import { Stack } from "expo-router";
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect, useState } from "react";
 import { setupDatabase } from "./db/database";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
@@ -12,10 +13,8 @@ export default function RootLayout() {
   useEffect(() => {
     async function setup() {
       try {
-        console.log("Veritabanı kurulumu başlıyor...");
         await setupDatabase();
         setDbReady(true);
-        console.log("Veritabanı başarıyla kuruldu.");
       } catch (e) {
         console.error("Veritabanı kurulumunda hata:", e);
       }
@@ -27,7 +26,6 @@ export default function RootLayout() {
     if (dbReady) {
       // Hide the splash screen after the database is ready
       SplashScreen.hideAsync();
-      console.log("Splash screen gizlendi.");
     }
   }, [dbReady]);
 
@@ -35,5 +33,13 @@ export default function RootLayout() {
     return null; // or a loading spinner
   }
 
-  return <Stack />;
+  return (
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#0D0C1D' }}>
+      <Stack
+        screenOptions={{
+          headerShown: false,
+        }}
+      />
+    </SafeAreaView>
+  );
 }

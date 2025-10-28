@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Add Subscription</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#00F0A0", // Bright mint green accent
+                        "secondary": "#9C27B0", // Vibrant purple
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#0D0C1D", // Dark purple/blue background
+                        "surface-dark": "#16152C",   // Slightly lighter surface color
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+    <style>
+        body {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+    </style>
+    <style>
+        body {
+            min-height: max(884px, 100dvh);
+        }
+    </style>
+    <style>
+        body {
+            min-height: max(884px, 100dvh);
+        }
+    </style>
+</head>
+
+<body class="bg-background-light dark:bg-background-dark font-display">
+    <div class="relative flex min-h-screen w-full flex-col">
+        <header class="flex items-center p-4 pb-2 bg-background-light dark:bg-background-dark">
+            <button class="text-slate-200 flex size-12 shrink-0 items-center justify-center">
+                <span class="material-symbols-outlined text-2xl">arrow_back</span>
+            </button>
+            <h1 class="text-slate-100 text-lg font-bold leading-tight tracking-tight flex-1 text-center pr-12">Add
+                Subscription</h1>
+        </header>
+        <main class="flex-grow px-4 py-3 space-y-6">
+            <label class="flex flex-col w-full">
+                <p class="text-slate-400 text-sm font-medium leading-normal pb-2">Subscription Name</p>
+                <input
+                    class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-white focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-slate-700 bg-surface-dark focus:border-primary h-14 placeholder:text-slate-500 p-4 text-base font-normal leading-normal"
+                    placeholder="e.g., Spotify" value="" />
+            </label>
+            <div class="flex items-end gap-4">
+                <label class="flex flex-col flex-1">
+                    <p class="text-slate-400 text-sm font-medium leading-normal pb-2">Amount</p>
+                    <input
+                        class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-white focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-slate-700 bg-surface-dark focus:border-primary h-14 placeholder:text-slate-500 p-4 text-base font-normal leading-normal"
+                        placeholder="$10.99" step="0.01" type="number" value="" />
+                </label>
+            </div>
+            <div>
+                <p class="text-slate-400 text-sm font-medium leading-normal pb-2">Billing Cycle</p>
+                <div class="flex h-12 flex-1 items-center justify-center rounded-xl bg-surface-dark p-1">
+                    <label
+                        class="flex cursor-pointer h-full grow items-center justify-center overflow-hidden rounded-lg px-2 has-[:checked]:bg-primary has-[:checked]:text-background-dark text-slate-300 text-sm font-medium leading-normal transition-all duration-300 ease-in-out">
+                        <span class="truncate">Monthly</span>
+                        <input checked="" class="invisible w-0" name="billing-cycle" type="radio" value="Monthly" />
+                    </label>
+                    <label
+                        class="flex cursor-pointer h-full grow items-center justify-center overflow-hidden rounded-lg px-2 has-[:checked]:bg-primary has-[:checked]:text-background-dark text-slate-300 text-sm font-medium leading-normal transition-all duration-300 ease-in-out">
+                        <span class="truncate">Yearly</span>
+                        <input class="invisible w-0" name="billing-cycle" type="radio" value="Yearly" />
+                    </label>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <label class="flex flex-col w-full">
+                    <p class="text-slate-400 text-sm font-medium leading-normal pb-2">Next Payment</p>
+                    <div class="relative">
+                        <input
+                            class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-white focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-slate-700 bg-surface-dark focus:border-primary h-14 placeholder:text-slate-500 p-4 pr-12 text-base font-normal leading-normal"
+                            onblur="(this.type='text')" onfocus="(this.type='date')" placeholder="Select Date"
+                            type="text" />
+                        <span
+                            class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-primary pointer-events-none">calendar_today</span>
+                    </div>
+                </label>
+                <label class="flex flex-col w-full">
+                    <p class="text-slate-400 text-sm font-medium leading-normal pb-2">Category</p>
+                    <div class="relative">
+                        <select
+                            class="form-select appearance-none flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-white focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-slate-700 bg-surface-dark focus:border-primary h-14 placeholder:text-slate-500 p-4 text-base font-normal leading-normal">
+                            <option class="text-slate-500" disabled="" selected="" value="">Select Category</option>
+                            <option class="bg-surface-dark text-white" value="entertainment">Entertainment</option>
+                            <option class="bg-surface-dark text-white" value="work">Work</option>
+                            <option class="bg-surface-dark text-white" value="utilities">Utilities</option>
+                            <option class="bg-surface-dark text-white" value="health">Health</option>
+                        </select>
+                        <span
+                            class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-primary pointer-events-none">expand_more</span>
+                    </div>
+                </label>
+            </div>
+        </main>
+        <footer class="sticky bottom-0 z-10 p-4 bg-background-dark/80 backdrop-blur-sm">
+            <button
+                class="w-full h-14 flex items-center justify-center rounded-xl bg-primary text-background-dark text-base font-bold leading-normal shadow-lg shadow-primary/30 hover:bg-primary/90 transition-colors duration-200">
+                Add Subscription
+            </button>
+        </footer>
+    </div>
+
+</body>
+
+</html>
