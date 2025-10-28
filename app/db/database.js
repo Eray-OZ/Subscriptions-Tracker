@@ -20,7 +20,13 @@ export const setupDatabase = async () => {
     console.log('Categories tablosu boş, başlangıç verileri ekleniyor...');
     await db.execAsync(`
         INSERT INTO Categories (name) VALUES ('Bills');
-        INSERT INTO Categories (name) VALUES ('Entertainment');
+        INSERT INTO Categories (name) VALUES ('Movie Streaming');
+        INSERT INTO Categories (name) VALUES ('Music');
+        INSERT INTO Categories (name) VALUES ('Gaming');
+        INSERT INTO Categories (name) VALUES ('Software');
+        INSERT INTO Categories (name) VALUES ('Cloud');
+        INSERT INTO Categories (name) VALUES ('Reading');
+        INSERT INTO Categories (name) VALUES ('Shopping');
         INSERT INTO Categories (name) VALUES ('Gym');
         INSERT INTO Categories (name) VALUES ('Others');
     `);
@@ -74,22 +80,38 @@ export const addPaymentToHistory = async (subscriptionId, name, amount, paymentD
 };
 
 
+export const getPaymentHistory = async () => {
+  if (!db) throw new Error("Veritabanı henüz kurulmadı!");
+  return await db.runAsync(
+    `SELECT * FROM PaymentHistory`
+  )
+}
+
+
+// Fonksiyon: updateSubscription
+// Amaç: Mevcut bir aboneliğin bilgilerini güncellemek.
+// Parametreler: id, name, amount, cycle, nextPaymentDate, categoryId
+// Gerekli SQL: UPDATE Subscriptions SET ... WHERE id = ?
+export const updateSubscription = async (subscriptionId, newDate) => {
+  if (!db) throw new Error("Veritabanı henüz kurulmadı!");
+
+  return db.runAsync(
+    `UPDATE Subscriptions SET nextPaymentDate = (?)
+     WHERE id=(?)`, [newDate, subscriptionId]
+  )
+}
+
+// Fonksiyon: deleteSubscription
+// Amaç: Belirli bir aboneliği veritabanından silmek.
+// Parametreler: id
+// Gerekli SQL: DELETE FROM Subscriptions WHERE id = ?
+
 export const deleteSubscription = async (subscriptionId) => {
   if (!db) throw new Error("Veritabanı henüz kurulmadı!");
   return db.runAsync(
     `DELETE FROM Subscriptions WHERE id=(?)`, [subscriptionId]
   )
 }
-
-// Fonksiyon: updateSubscription
-// Amaç: Mevcut bir aboneliğin bilgilerini güncellemek.
-// Parametreler: id, name, amount, cycle, nextPaymentDate, categoryId
-// Gerekli SQL: UPDATE Subscriptions SET ... WHERE id = ?
-
-// Fonksiyon: deleteSubscription
-// Amaç: Belirli bir aboneliği veritabanından silmek.
-// Parametreler: id
-// Gerekli SQL: DELETE FROM Subscriptions WHERE id = ?
 
 // Fonksiyon: getMonthlySpending
 // Amaç: Belirli bir ay ve yıl için yapılan toplam harcamayı hesaplamak.

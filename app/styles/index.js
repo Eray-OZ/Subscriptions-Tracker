@@ -13,6 +13,7 @@ export const colors = {
   slate200: '#E2E8F0',
   slate400: '#94A3B8',
   slate800: '#1e293b',
+  red400: '#F87171',
 };
 
 export const styles = StyleSheet.create({
@@ -48,20 +49,27 @@ export const styles = StyleSheet.create({
     paddingVertical: 12,
   },
   subscriptionItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: 'column',
     gap: 16,
     borderRadius: 16,
     backgroundColor: colors.surfaceDark,
     padding: 16,
-    borderWidth: 1,
-    borderColor: colors.slate800,
     marginBottom: 12,
+  },
+  itemRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 16,
+  },
+  itemFooter: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
   subscriptionIconContainer: {
     width: 48,
     height: 48,
-    borderRadius: 24,
+    borderRadius: 8,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -82,6 +90,30 @@ export const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: 'white',
   },
+  paymentStatusText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: colors.primary,
+  },
+  paidStatusText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: colors.slate400,
+  },
+  deleteButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+    borderRadius: 9999,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+  },
+  deleteButtonText: {
+    color: colors.red400,
+    fontSize: 12,
+    fontWeight: '600',
+  },
   footer: {
     padding: 16,
     backgroundColor: 'rgba(13, 12, 29, 0.8)',
@@ -101,5 +133,81 @@ export const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     marginLeft: 8,
+  },
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+  },
+  modalView: {
+    width: '90%',
+    maxWidth: 360,
+    backgroundColor: colors.surfaceDark,
+    borderRadius: 12,
+    padding: 24,
+    gap: 24,
+  },
+  modalText: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: 'white',
+    textAlign: 'center',
+  },
+  datePickerContainer: {
+    gap: 8,
+  },
+  datePickerLabel: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: colors.slate400,
+  },
+  datePickerInputContainer: {
+    height: 48,
+    justifyContent: 'center',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: colors.slate800,
+    backgroundColor: colors.backgroundDark,
+    paddingHorizontal: 16,
+  },
+  datePickerInput: {
+    fontSize: 16,
+    color: colors.slate100,
+  },
+  modalButtonContainer: {
+    flexDirection: 'row',
+    gap: 16,
+  },
+  modalButton: {
+    flex: 1,
+    height: 48,
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  confirmButton: {
+    backgroundColor: colors.primary,
+    shadowColor: colors.primary,
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  cancelButton: {
+    backgroundColor: 'rgba(51, 65, 85, 0.5)',
+  },
+  confirmButtonText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: colors.backgroundDark,
+  },
+  cancelButtonText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: colors.slate200,
   },
 });

@@ -1,14 +1,16 @@
+
 import { useState, useCallback } from "react";
-import { FlatList, Text, View, TouchableOpacity } from "react-native";
+import { FlatList, Text, View, TouchableOpacity, Modal, TextInput, Platform } from "react-native";
 import { Link } from "expo-router";
 import { useFocusEffect } from "@react-navigation/native";
-import { getSubscriptions, deleteSubscription } from "./db/database";
+import { getSubscriptions, deleteSubscription, addPaymentToHistory, updateSubscription, getPaymentHistory } from "./db/database";
 import { styles, colors } from "./styles/index.js";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { LinearGradient } from 'expo-linear-gradient';
-import { differenceInDays, isBefore } from 'date-fns';
+import { differenceInDays, isBefore, format } from 'date-fns';
+import DateTimePicker from '@react-native-community/datetimepicker';
 
-// Helper function to get a deterministic gradient for the icons
+
 const gradients = [
     ['#a855f7', '#6366f1'],
     ['#ec4899', '#ef4444'],
@@ -22,8 +24,14 @@ const getGradientForId = (id) => {
 
 const getIconForCategory = (category) => {
     switch (category) {
-        case 'Entertainment': return 'movie';
         case 'Bills': return 'receipt';
+        case 'Movie Streaming': return 'movie';
+        case 'Music': return 'music-note';
+        case 'Gaming': return 'gamepad-variant';
+        case 'Software': return 'code-braces';
+        case 'Cloud': return 'cloud';
+        case 'Reading': return 'book-open-page-variant';
+        case 'Shopping': return 'cart';
         case 'Gym': return 'dumbbell';
         case 'Others': return 'shape-outline';
         default: return 'help-circle';
@@ -32,6 +40,11 @@ const getIconForCategory = (category) => {
 
 export default function Index() {
     const [subscriptions, setSubscriptions] = useState([]);
+    const [isModalVisible, setModalVisible] = useState(false);
+    const [selectedSubscription, setSelectedSubscription] = useState(null);
+    const [showDatePicker, setShowDatePicker] = useState(false);
+    const [newPaymentDate, setNewPaymentDate] = useState(new Date())
+
 
     const fetchSubscriptions = async () => {
         try {
@@ -41,6 +54,7 @@ export default function Index() {
             console.error("Error fetching subscriptions", error);
         }
     };
+
 
     useFocusEffect(
         useCallback(() => {
@@ -57,44 +71,132 @@ export default function Index() {
         }
     };
 
+    const openModal = (subscription) => {
+        setSelectedSubscription(subscription);
+        setModalVisible(true);
+    };
+
+    const handleConfirmPayment = async () => {
+        if (!selectedSubscription) {
+            return;
+        }
+        try {
+            const today = new Date();
+
+            await Promise.all([
+                addPaymentToHistory(
+                    selectedSubscription.id,
+                    selectedSubscription.name,
+                    selectedSubscription.amount,
+                    format(today, 'yyyy-MM-dd'),
+                    selectedSubscription.categoryId
+                ),
+                updateSubscription(selectedSubscription.id, format(newPaymentDate, 'yyyy-MM-dd'))
+            ]);
+            setModalVisible(false);
+            fetchSubscriptions();
+        } catch (error) {
+            console.error("Error confirming payment", error);
+        }
+    };
+
+
+    const onDateChange = (event, selectedDate) => {
+        const currentDate = selectedDate || newPaymentDate;
+        setShowDatePicker(Platform.OS === 'ios');
+        setNewPaymentDate(currentDate);
+    };
+
     const renderItem = ({ item }) => {
         const today = new Date();
         const nextPaymentDate = new Date(item.next_payment_date);
         const remainingDays = differenceInDays(nextPaymentDate, today);
 
-        let paymentStatusText = '';
-        if (isBefore(nextPaymentDate, today)) {
-            paymentStatusText = 'Paid?';
-        } else {
-            paymentStatusText = `${remainingDays} days left`;
-        }
+        const isPast = isBefore(nextPaymentDate, today);
 
         return (
             <View style={styles.subscriptionItem}>
-                <LinearGradient
-                    colors={getGradientForId(item.id)}
-                    style={styles.subscriptionIconContainer}
-                >
-                    <MaterialCommunityIcons name={getIconForCategory(item.category_name)} size={24} color="white" />
-                </LinearGradient>
-                <View style={styles.subscriptionInfo}>
-                    <Text style={styles.subscriptionName}>{item.name}</Text>
-                    <Text style={styles.subscriptionNextPayment}>Next payment: {nextPaymentDate.toLocaleDateString()}</Text>
+                <View style={styles.itemRow}>
+                    <LinearGradient
+                        colors={getGradientForId(item.id)}
+                        style={styles.subscriptionIconContainer}
+                    >
+                        <MaterialCommunityIcons name={getIconForCategory(item.category_name)} size={24} color="white" />
+                    </LinearGradient>
+                    <View style={styles.subscriptionInfo}>
+                        <Text style={styles.subscriptionName}>{item.name}</Text>
+                        <Text style={styles.subscriptionNextPayment}>Next: {nextPaymentDate.toLocaleDateString()}</Text>
+                    </View>
+                    <Text style={styles.subscriptionAmount}>${item.amount.toFixed(2)}</Text>
                 </View>
-                <Text style={styles.subscriptionAmount}>${item.amount.toFixed(2)}</Text>
-                <TouchableOpacity onPress={() => handleDelete(item.id)}><Text style={{ color: 'red' }}>Delete</Text></TouchableOpacity>
-                <TouchableOpacity><Text style={{ color: 'green' }}>{paymentStatusText}</Text></TouchableOpacity>
+                <View style={styles.itemFooter}>
+                    {isPast ? (
+                        <TouchableOpacity onPress={() => openModal(item)}>
+                            <Text style={styles.paidStatusText}>Paid?</Text>
+                        </TouchableOpacity>
+                    ) : (
+                        <Text style={styles.paymentStatusText}>{remainingDays} days left</Text>
+                    )}
+                    <TouchableOpacity style={styles.deleteButton} onPress={() => handleDelete(item.id)}>
+                        <MaterialCommunityIcons name="delete" size={16} color={colors.red400} />
+                        <Text style={styles.deleteButtonText}>Delete</Text>
+                    </TouchableOpacity>
+                </View>
             </View>
         );
     }
 
     return (
         <View style={styles.container}>
+            <Modal
+                animationType="slide"
+                transparent={true}
+                visible={isModalVisible}
+                onRequestClose={() => {
+                    setModalVisible(!isModalVisible);
+                }}
+            >
+                <View style={styles.centeredView}>
+                    <View style={styles.modalView}>
+                        <Text style={styles.modalText}>Mark {selectedSubscription?.name} as paid?</Text>
+
+                        <View style={styles.datePickerContainer}>
+                            <Text style={styles.datePickerLabel}>Next Payment Date</Text>
+                            <TouchableOpacity onPress={() => setShowDatePicker(true)} style={styles.datePickerInputContainer}>
+                                <Text style={styles.datePickerInput}>{format(newPaymentDate, 'yyyy-MM-dd')}</Text>
+                            </TouchableOpacity>
+                            {showDatePicker && (
+                                <DateTimePicker
+                                    testID="dateTimePicker"
+                                    value={newPaymentDate}
+                                    mode={"date"}
+                                    is24Hour={true}
+                                    display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                                    onChange={onDateChange}
+                                />
+                            )}
+                        </View>
+
+                        <View style={styles.modalButtonContainer}>
+                            <TouchableOpacity
+                                style={[styles.modalButton, styles.cancelButton]}
+                                onPress={() => setModalVisible(false)}
+                            >
+                                <Text style={styles.cancelButtonText}>Cancel</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                style={[styles.modalButton, styles.confirmButton]}
+                                onPress={handleConfirmPayment}
+                            >
+                                <Text style={styles.confirmButtonText}>Confirm</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </View>
+            </Modal>
+
             <View style={styles.header}>
                 <Text style={styles.headerTitle}>Subscriptions</Text>
-                <TouchableOpacity style={styles.searchButton}>
-                    <MaterialCommunityIcons name="magnify" size={20} color={colors.slate100} />
-                </TouchableOpacity>
             </View>
 
             <FlatList
