@@ -3,7 +3,7 @@ import { useState, useCallback } from "react";
 import { FlatList, Text, View, TouchableOpacity, Modal, TextInput, Platform } from "react-native";
 import { Link } from "expo-router";
 import { useFocusEffect } from "@react-navigation/native";
-import { getSubscriptions, deleteSubscription, addPaymentToHistory, updateSubscription, getPaymentHistory } from "./db/database";
+import { getSubscriptions, deleteSubscription, addPaymentToHistory, updateSubscription, updateAmount } from "./db/database";
 import { styles, colors } from "./styles/index.js";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { LinearGradient } from 'expo-linear-gradient';
@@ -44,6 +44,8 @@ export default function Index() {
     const [selectedSubscription, setSelectedSubscription] = useState(null);
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [newPaymentDate, setNewPaymentDate] = useState(new Date())
+    const [isEditing, setIsEditing] = useState(false)
+    const [newPrice, setNewPrice] = useState('')
 
 
     const fetchSubscriptions = async () => {
@@ -65,7 +67,7 @@ export default function Index() {
     const handleDelete = async (id) => {
         try {
             await deleteSubscription(id);
-            fetchSubscriptions(); // Refetch subscriptions after deleting
+            fetchSubscriptions();
         } catch (error) {
             console.error("Error deleting subscription", error);
         }
@@ -75,6 +77,13 @@ export default function Index() {
         setSelectedSubscription(subscription);
         setModalVisible(true);
     };
+
+
+    const handlePrice = async (id) => {
+        await updateAmount(id, newPrice)
+        setIsEditing(false)
+        fetchSubscriptions()
+    }
 
     const handleConfirmPayment = async () => {
         if (!selectedSubscription) {
@@ -127,21 +136,38 @@ export default function Index() {
                         <Text style={styles.subscriptionName}>{item.name}</Text>
                         <Text style={styles.subscriptionNextPayment}>Next: {nextPaymentDate.toLocaleDateString()}</Text>
                     </View>
-                    <Text style={styles.subscriptionAmount}>${item.amount.toFixed(2)}</Text>
+                    {!isEditing ? <Text style={styles.subscriptionAmount}>${item.amount.toFixed(2)}</Text>
+                        : <TextInput
+                            style={styles.subscriptionAmountInput}
+                            placeholder="$ New Price"
+                            placeholderTextColor={colors.primary}
+                            value={newPrice}
+                            onChangeText={setNewPrice}
+                            keyboardType="numeric"
+                        />}
+
                 </View>
                 <View style={styles.itemFooter}>
                     {isPast ? (
-                        <TouchableOpacity onPress={() => openModal(item)}>
-                            <Text style={styles.paidStatusText}>Paid?</Text>
+                        <TouchableOpacity style={styles.confirmPaymentButton} onPress={() => openModal(item)}>
+                            <MaterialCommunityIcons name="check" size={16} color={'#FFA500'} />
+                            <Text style={styles.confirmPaymentButtonText}>Confirm</Text>
                         </TouchableOpacity>
                     ) : (
                         <Text style={styles.paymentStatusText}>{remainingDays} days left</Text>
                     )}
                     <View style={{ flexDirection: 'row', gap: 8 }}>
-                        <TouchableOpacity style={styles.updateButton} onPress={() => { }}>
-                            <MaterialCommunityIcons name="pencil" size={16} color={colors.primary} />
-                            <Text style={styles.updateButtonText}>Update</Text>
-                        </TouchableOpacity>
+
+                        {!isEditing ?
+                            <TouchableOpacity style={styles.updateButton} onPress={() => { setIsEditing(true) }}>
+                                <MaterialCommunityIcons name="pencil" size={16} color={colors.primary} />
+                                <Text style={styles.updateButtonText}>Price</Text>
+                            </TouchableOpacity> :
+                            <TouchableOpacity style={styles.updateButton} onPress={() => handlePrice(item.id)}>
+                                <MaterialCommunityIcons name="pencil" size={16} color={colors.primary} />
+                                <Text style={styles.updateButtonText}>Confirm</Text>
+                            </TouchableOpacity>}
+
                         <TouchableOpacity style={styles.deleteButton} onPress={() => handleDelete(item.id)}>
                             <MaterialCommunityIcons name="delete" size={16} color={colors.red400} />
                             <Text style={styles.deleteButtonText}>Delete</Text>
@@ -213,7 +239,7 @@ export default function Index() {
                 renderItem={renderItem}
                 keyExtractor={(item) => item.id.toString()}
                 style={styles.main}
-                contentContainerStyle={{ paddingBottom: 100 }} // To avoid footer overlap
+                contentContainerStyle={{ paddingBottom: 100 }}
             />
 
             <View style={styles.footer}>
