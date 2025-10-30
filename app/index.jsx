@@ -42,33 +42,34 @@ const getIconForCategory = (category) => {
 const scheduleNotification = async (id, name, paymentDate) => {
     const triggerDate = new Date(paymentDate);
     triggerDate.setDate(triggerDate.getDate() - 1);
-    triggerDate.setHours(22);
-    triggerDate.setMinutes(55);
+    triggerDate.setHours(9);
+    triggerDate.setMinutes(0);
     triggerDate.setSeconds(0);
 
-    console.log(`Scheduling notification for subscription ${id} at ${triggerDate}`);
 
-                    await Notifications.scheduleNotificationAsync({
 
-                        content: {
+    await Notifications.scheduleNotificationAsync({
 
-                            title: "Subscription Reminder",
+        content: {
 
-                            body: `Your ${name} subscription is due tomorrow.`,
+            title: "Subscription Reminder",
 
-                        },
+            body: `Your ${name} subscription is due tomorrow.`,
 
-                        trigger: {
+        },
 
-                            type: 'date',
+        trigger: {
 
-                            date: triggerDate,
+            type: 'date',
 
-                        },
+            date: triggerDate,
 
-                        identifier: `subscription-${id}`
+        },
 
-                    });};
+        identifier: `subscription-${id}`
+
+    });
+};
 
 export default function Index() {
     const [subscriptions, setSubscriptions] = useState([]);

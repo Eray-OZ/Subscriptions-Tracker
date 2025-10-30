@@ -48,11 +48,11 @@ export default function AddScreen() {
     const scheduleNotification = async (id, name, paymentDate) => {
         const triggerDate = new Date(paymentDate);
         triggerDate.setDate(triggerDate.getDate() - 1);
-        triggerDate.setHours(23);
-        triggerDate.setMinutes(2);
+        triggerDate.setHours(9);
+        triggerDate.setMinutes(0);
         triggerDate.setSeconds(0);
 
-        console.log(`Scheduling notification for subscription ${id} at ${triggerDate}`);
+
 
         await Notifications.scheduleNotificationAsync({
             content: {

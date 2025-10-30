@@ -1,9 +1,7 @@
 import * as SQLite from 'expo-sqlite';
 
-// 1. db değişkenini en üstte null olarak başlat.
 let db = null;
 
-// 2. Veritabanını kuracak ve db değişkenini dolduracak TEK bir ana fonksiyon oluştur.
 export const setupDatabase = async () => {
   db = await SQLite.openDatabaseAsync('SubTracker');
 
@@ -14,11 +12,6 @@ export const setupDatabase = async () => {
   `);
 };
 
-// 3. Diğer tüm fonksiyonlar artık db değişkeninin dolu olduğunu varsayarak çalışabilir.
-// Fonksiyon: getSubscriptions
-// Amaç: Tüm abonelikleri veya belirli bir sıralama/filtreleme ölçütüne göre abonelikleri veritabanından almak.
-// Parametreler: sort_option (sıralama seçeneği), filter_option (filtreleme seçeneği)
-// Gerekli SQL: SELECT * FROM Subscriptions ORDER BY ...
 export const getSubscriptions = async () => {
   if (!db) throw new Error("Veritabanı henüz kurulmadı!");
   const allSubs = await db.getAllAsync(`
@@ -37,10 +30,6 @@ export const getCategories = async () => {
   return allCategories
 }
 
-// Fonksiyon: addSubscription
-// Amaç: Veritabanına yeni bir abonelik eklemek.
-// Parametreler: name, amount, cycle, nextPaymentDate, categoryId
-// Gerekli SQL: INSERT INTO Subscriptions (...) VALUES (...)
 export const addSubscription = async (name, amount, nextPaymentDate, categoryId) => {
   if (!db) throw new Error("Veritabanı henüz kurulmadı!");
   const result = await db.runAsync(
@@ -50,10 +39,6 @@ export const addSubscription = async (name, amount, nextPaymentDate, categoryId)
   return result.lastInsertRowId;
 };
 
-// Fonksiyon: addPaymentToHistory
-// Amaç: Bir ödeme yapıldığında, bu ödemeyi PaymentHistory tablosuna kaydetmek.
-// Parametreler: subscriptionId, name, amount, paymentDate, categoryId
-// Gerekli SQL: INSERT INTO PaymentHistory (...) VALUES (...)
 export const addPaymentToHistory = async (subscriptionId, name, amount, paymentDate, categoryId) => {
   if (!db) throw new Error("Veritabanı henüz kurulmadı!");
   return await db.runAsync(
@@ -70,11 +55,6 @@ export const getPaymentHistory = async () => {
   )
 }
 
-
-// Fonksiyon: updateSubscription
-// Amaç: Mevcut bir aboneliğin bilgilerini güncellemek.
-// Parametreler: id, name, amount, cycle, nextPaymentDate, categoryId
-// Gerekli SQL: UPDATE Subscriptions SET ... WHERE id = ?
 export const updateSubscription = async (subscriptionId, newDate) => {
   if (!db) throw new Error("Veritabanı henüz kurulmadı!");
 
@@ -94,19 +74,9 @@ export const updateAmount = async (subscriptionId, newAmount) => {
   )
 }
 
-// Fonksiyon: deleteSubscription
-// Amaç: Belirli bir aboneliği veritabanından silmek.
-// Parametreler: id
-// Gerekli SQL: DELETE FROM Subscriptions WHERE id = ?
-
 export const deleteSubscription = async (subscriptionId) => {
   if (!db) throw new Error("Veritabanı henüz kurulmadı!");
   return db.runAsync(
     `DELETE FROM Subscriptions WHERE id=(?)`, [subscriptionId]
   )
 }
-
-// Fonksiyon: getMonthlySpending
-// Amaç: Belirli bir ay ve yıl için yapılan toplam harcamayı hesaplamak.
-// Parametreler: month, year
-// Gerekli SQL: SELECT SUM(amount) FROM PaymentHistory WHERE strftime('%Y-%m', paymentDate) = 'YYYY-MM'
