@@ -43,10 +43,11 @@ export const getCategories = async () => {
 // Gerekli SQL: INSERT INTO Subscriptions (...) VALUES (...)
 export const addSubscription = async (name, amount, nextPaymentDate, categoryId) => {
   if (!db) throw new Error("Veritabanı henüz kurulmadı!");
-  return await db.runAsync(
+  const result = await db.runAsync(
     'INSERT INTO Subscriptions (name, amount, nextPaymentDate, categoryId) VALUES (?, ?, ?, ?)',
     [name, amount, nextPaymentDate, categoryId]
   );
+  return result.lastInsertRowId;
 };
 
 // Fonksiyon: addPaymentToHistory

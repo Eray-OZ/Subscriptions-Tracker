@@ -6,6 +6,15 @@ import { addSubscription, getCategories } from "./db/database.js";
 import { styles, colors } from "./styles/add.js";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import DateTimePicker from '@react-native-community/datetimepicker';
+import * as Notifications from 'expo-notifications';
+
+Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+        shouldShowAlert: true,
+        shouldPlaySound: false,
+        shouldSetBadge: false,
+    }),
+});
 
 export default function AddScreen() {
     const [categories, setCategories] = useState([]);
@@ -17,6 +26,15 @@ export default function AddScreen() {
     const [showDatePicker, setShowDatePicker] = useState(false);
 
     useEffect(() => {
+        const requestPermissions = async () => {
+            const { status } = await Notifications.requestPermissionsAsync();
+            if (status !== 'granted') {
+                alert('No notification permissions!');
+                return;
+            }
+        };
+        requestPermissions();
+
         const getCats = async () => {
             const cats = await getCategories();
             setCategories(cats);
@@ -27,9 +45,27 @@ export default function AddScreen() {
         getCats();
     }, []);
 
+    const scheduleNotification = async (id, name, paymentDate) => {
+        const trigger = new Date(paymentDate);
+        trigger.setDate(trigger.getDate() - 1);
+        trigger.setHours(22);
+        trigger.setMinutes(17);
+        trigger.setSeconds(0);
+
+        await Notifications.scheduleNotificationAsync({
+            content: {
+                title: "Subscription Reminder",
+                body: `Your ${name} subscription is due tomorrow.`,
+            },
+            trigger,
+            identifier: `subscription-${id}`
+        });
+    };
+
     const handleSave = async () => {
         try {
-            await addSubscription(name, parseFloat(amount), nextPaymentDate.toISOString().split('T')[0], selectedCategory);
+            const newSubscriptionId = await addSubscription(name, parseFloat(amount), nextPaymentDate.toISOString().split('T')[0], selectedCategory);
+            await scheduleNotification(newSubscriptionId, name, nextPaymentDate);
             router.back();
         } catch (error) {
             console.error("Error adding subscription:", error);
