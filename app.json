@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "SubTracker",
+    "name": "Subscription Tracker",
     "slug": "SubTracker",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -24,6 +24,9 @@
     "web": {
       "output": "static",
       "favicon": "./assets/images/favicon.png"
+    },
+    "notification": {
+      "icon": "./assets/images/notification-icon.png"
     },
     "plugins": [
       "expo-router",

@@ -7,8 +7,9 @@ import { getSubscriptions, deleteSubscription, addPaymentToHistory, updateSubscr
 import { styles, colors } from "./styles/index.js";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { LinearGradient } from 'expo-linear-gradient';
-import { differenceInDays, isBefore, format } from 'date-fns';
+import { differenceInDays, isBefore, format, differenceInCalendarDays } from 'date-fns';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import * as Notifications from 'expo-notifications';
 
 
 const gradients = [
@@ -37,6 +38,37 @@ const getIconForCategory = (category) => {
         default: return 'help-circle';
     }
 }
+
+const scheduleNotification = async (id, name, paymentDate) => {
+    const triggerDate = new Date(paymentDate);
+    triggerDate.setDate(triggerDate.getDate() - 1);
+    triggerDate.setHours(22);
+    triggerDate.setMinutes(55);
+    triggerDate.setSeconds(0);
+
+    console.log(`Scheduling notification for subscription ${id} at ${triggerDate}`);
+
+                    await Notifications.scheduleNotificationAsync({
+
+                        content: {
+
+                            title: "Subscription Reminder",
+
+                            body: `Your ${name} subscription is due tomorrow.`,
+
+                        },
+
+                        trigger: {
+
+                            type: 'date',
+
+                            date: triggerDate,
+
+                        },
+
+                        identifier: `subscription-${id}`
+
+                    });};
 
 export default function Index() {
     const [subscriptions, setSubscriptions] = useState([]);
@@ -67,6 +99,7 @@ export default function Index() {
     const handleDelete = async (id) => {
         try {
             await deleteSubscription(id);
+            await Notifications.cancelScheduledNotificationAsync(`subscription-${id}`);
             fetchSubscriptions();
         } catch (error) {
             console.error("Error deleting subscription", error);
@@ -102,6 +135,9 @@ export default function Index() {
                 ),
                 updateSubscription(selectedSubscription.id, format(newPaymentDate, 'yyyy-MM-dd'))
             ]);
+
+            await scheduleNotification(selectedSubscription.id, selectedSubscription.name, newPaymentDate);
+
             setModalVisible(false);
             fetchSubscriptions();
         } catch (error) {
@@ -119,7 +155,7 @@ export default function Index() {
     const renderItem = ({ item }) => {
         const today = new Date();
         const nextPaymentDate = new Date(item.next_payment_date);
-        const remainingDays = differenceInDays(nextPaymentDate, today);
+        const remainingDays = differenceInCalendarDays(nextPaymentDate, today);
 
         const isPast = isBefore(nextPaymentDate, today);
 

@@ -1,50 +1,64 @@
-# Welcome to your Expo app 👋
+# Subscription Tracker
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Subscription Tracker is a mobile application built with React Native and Expo that helps you keep track of your subscriptions. Never miss a payment again with scheduled notifications for upcoming due dates.
 
-## Get started
+## Features
 
-1. Install dependencies
+- **Add and Manage Subscriptions:** Easily add new subscriptions with details like name, amount, next payment date, and category.
+- **Subscription Overview:** View all your subscriptions in a clean, organized list.
+- **Days Remaining:** See at a glance how many days are left until the next payment for each subscription.
+- **Payment Confirmation:** Mark subscriptions as paid and set the next payment date.
+- **Price Updates:** Update the price of a subscription if it changes.
+- **Deletion:** Remove subscriptions you no longer need.
+- **Scheduled Notifications:** Automatically receive a notification one day before a subscription payment is due.
+- **Categorization:** Assign categories to your subscriptions for better organization.
 
-   ```bash
+## Technologies Used
+
+- [React Native](https://reactnative.dev/) - A framework for building native apps using React.
+- [Expo](https://expo.dev/) - A platform for making universal React applications.
+- [Expo Router](https://expo.github.io/router/) - A file-based router for React Native and web applications.
+- [Expo SQLite](https://docs.expo.dev/versions/latest/sdk/sqlite/) - A library for using a SQLite database.
+- [date-fns](https://date-fns.org/) - A modern JavaScript date utility library.
+- [Expo Notifications](https://docs.expo.dev/versions/latest/sdk/notifications/) - A library for scheduling and handling notifications.
+
+## Getting Started
+
+To get a local copy up and running, follow these simple steps.
+
+### Prerequisites
+
+- Node.js
+- npm or yarn
+
+### Installation
+
+1. Clone the repo
+   ```sh
+   git clone https://github.com/Eray-OZ/Subscriptions-Tracker.git
+   ```
+2. Install NPM packages
+   ```sh
    npm install
    ```
 
-2. Start the app
+### Running the App
 
-   ```bash
+1. Start the Metro bundler
+   ```sh
    npx expo start
    ```
+2. Follow the instructions in the terminal to run the app on an Android emulator, an iOS simulator, or on your physical device using the Expo Go app.
 
-In the output, you'll find options to open the app in a
+## Project Structure
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
 ```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+.
+├── app/              # Main application code
+│   ├── db/           # Database setup and queries
+│   ├── styles/       # Styles for the screens
+│   ├── add.jsx       # Screen for adding new subscriptions
+│   └── index.jsx     # Main screen with the list of subscriptions
+├── assets/           # Images and other static assets
+└── app.json          # Expo configuration file
+```

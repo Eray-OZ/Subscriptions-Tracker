@@ -46,18 +46,23 @@ export default function AddScreen() {
     }, []);
 
     const scheduleNotification = async (id, name, paymentDate) => {
-        const trigger = new Date(paymentDate);
-        trigger.setDate(trigger.getDate() - 1);
-        trigger.setHours(22);
-        trigger.setMinutes(17);
-        trigger.setSeconds(0);
+        const triggerDate = new Date(paymentDate);
+        triggerDate.setDate(triggerDate.getDate() - 1);
+        triggerDate.setHours(23);
+        triggerDate.setMinutes(2);
+        triggerDate.setSeconds(0);
+
+        console.log(`Scheduling notification for subscription ${id} at ${triggerDate}`);
 
         await Notifications.scheduleNotificationAsync({
             content: {
                 title: "Subscription Reminder",
                 body: `Your ${name} subscription is due tomorrow.`,
             },
-            trigger,
+            trigger: {
+                type: 'date',
+                date: triggerDate,
+            },
             identifier: `subscription-${id}`
         });
     };
