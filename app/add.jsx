@@ -6,15 +6,7 @@ import { addSubscription, getCategories } from "./db/database.js";
 import { styles, colors } from "./styles/add.js";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import DateTimePicker from '@react-native-community/datetimepicker';
-import * as Notifications from 'expo-notifications';
-
-Notifications.setNotificationHandler({
-    handleNotification: async () => ({
-        shouldShowAlert: true,
-        shouldPlaySound: false,
-        shouldSetBadge: false,
-    }),
-});
+import { scheduleSubscriptionNotification } from "./utils/notifications";
 
 export default function AddScreen() {
     const [categories, setCategories] = useState([]);
@@ -26,15 +18,6 @@ export default function AddScreen() {
     const [showDatePicker, setShowDatePicker] = useState(false);
 
     useEffect(() => {
-        const requestPermissions = async () => {
-            const { status } = await Notifications.requestPermissionsAsync();
-            if (status !== 'granted') {
-                alert('No notification permissions!');
-                return;
-            }
-        };
-        requestPermissions();
-
         const getCats = async () => {
             const cats = await getCategories();
             setCategories(cats);
@@ -45,32 +28,10 @@ export default function AddScreen() {
         getCats();
     }, []);
 
-    const scheduleNotification = async (id, name, paymentDate) => {
-        const triggerDate = new Date(paymentDate);
-        triggerDate.setDate(triggerDate.getDate() - 1);
-        triggerDate.setHours(9);
-        triggerDate.setMinutes(0);
-        triggerDate.setSeconds(0);
-
-
-
-        await Notifications.scheduleNotificationAsync({
-            content: {
-                title: "Subscription Reminder",
-                body: `Your ${name} subscription is due tomorrow.`,
-            },
-            trigger: {
-                type: 'date',
-                date: triggerDate,
-            },
-            identifier: `subscription-${id}`
-        });
-    };
-
     const handleSave = async () => {
         try {
             const newSubscriptionId = await addSubscription(name, parseFloat(amount), nextPaymentDate.toISOString().split('T')[0], selectedCategory);
-            await scheduleNotification(newSubscriptionId, name, nextPaymentDate);
+            await scheduleSubscriptionNotification(newSubscriptionId, name, nextPaymentDate);
             router.back();
         } catch (error) {
             console.error("Error adding subscription:", error);

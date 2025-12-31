@@ -1,4 +1,3 @@
-
 import { useState, useCallback } from "react";
 import { FlatList, Text, View, TouchableOpacity, Modal, TextInput, Platform } from "react-native";
 import { Link } from "expo-router";
@@ -7,9 +6,9 @@ import { getSubscriptions, deleteSubscription, addPaymentToHistory, updateSubscr
 import { styles, colors } from "./styles/index.js";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { LinearGradient } from 'expo-linear-gradient';
-import { differenceInDays, isBefore, format, differenceInCalendarDays } from 'date-fns';
+import { isBefore, format, differenceInCalendarDays } from 'date-fns';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import * as Notifications from 'expo-notifications';
+import { scheduleSubscriptionNotification, cancelSubscriptionNotification } from './utils/notifications';
 
 
 const gradients = [
@@ -39,37 +38,7 @@ const getIconForCategory = (category) => {
     }
 }
 
-const scheduleNotification = async (id, name, paymentDate) => {
-    const triggerDate = new Date(paymentDate);
-    triggerDate.setDate(triggerDate.getDate() - 1);
-    triggerDate.setHours(9);
-    triggerDate.setMinutes(0);
-    triggerDate.setSeconds(0);
 
-
-
-    await Notifications.scheduleNotificationAsync({
-
-        content: {
-
-            title: "Subscription Reminder",
-
-            body: `Your ${name} subscription is due tomorrow.`,
-
-        },
-
-        trigger: {
-
-            type: 'date',
-
-            date: triggerDate,
-
-        },
-
-        identifier: `subscription-${id}`
-
-    });
-};
 
 export default function Index() {
     const [subscriptions, setSubscriptions] = useState([]);
@@ -100,7 +69,7 @@ export default function Index() {
     const handleDelete = async (id) => {
         try {
             await deleteSubscription(id);
-            await Notifications.cancelScheduledNotificationAsync(`subscription-${id}`);
+            await cancelSubscriptionNotification(id);
             fetchSubscriptions();
         } catch (error) {
             console.error("Error deleting subscription", error);
@@ -137,7 +106,7 @@ export default function Index() {
                 updateSubscription(selectedSubscription.id, format(newPaymentDate, 'yyyy-MM-dd'))
             ]);
 
-            await scheduleNotification(selectedSubscription.id, selectedSubscription.name, newPaymentDate);
+            await scheduleSubscriptionNotification(selectedSubscription.id, selectedSubscription.name, newPaymentDate);
 
             setModalVisible(false);
             fetchSubscriptions();

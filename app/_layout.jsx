@@ -1,11 +1,19 @@
 import { Stack } from "expo-router";
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect, useState } from "react";
-import { setupDatabase } from "./db/database";
+import { setupDatabase, getSubscriptions } from "./db/database";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { 
+  setupNotificationHandler, 
+  requestNotificationPermissions, 
+  rescheduleAllNotifications 
+} from "./utils/notifications";
 
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
+
+// Setup notification handler globally
+setupNotificationHandler();
 
 export default function RootLayout() {
   const [dbReady, setDbReady] = useState(false);
@@ -15,8 +23,17 @@ export default function RootLayout() {
       try {
         await setupDatabase();
         setDbReady(true);
+
+        // Request notification permissions
+        const hasPermission = await requestNotificationPermissions();
+        
+        if (hasPermission) {
+          // Reschedule all notifications on app launch
+          const subscriptions = await getSubscriptions();
+          await rescheduleAllNotifications(subscriptions);
+        }
       } catch (e) {
-        console.error("Veritabanı kurulumunda hata:", e);
+        console.error("Setup error:", e);
       }
     }
     setup();

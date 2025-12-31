@@ -1,0 +1,24 @@
+# Dependencies (reinstalled on build server)
+node_modules/
+
+# Git
+.git/
+
+# IDE/Editor
+.vscode/
+.idea/
+
+# Build outputs
+dist/
+build/
+*.log
+
+# Local env files
+.env.local
+.env.*.local
+
+# Design files (not needed for build)
+design/
+
+# macOS
+.DS_Store
