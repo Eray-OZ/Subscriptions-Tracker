@@ -1,21 +1,27 @@
 import { useState, useEffect } from "react";
-import { View, Text, TextInput, TouchableOpacity, Platform } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, Platform, KeyboardAvoidingView, ScrollView } from "react-native";
 import { Picker } from "@react-native-picker/picker";
-import { router } from "expo-router";
-import { addSubscription, getCategories } from "./db/database.js";
-import { styles, colors } from "./styles/add.js";
+import { router, useLocalSearchParams } from "expo-router";
+import { addSubscription, getCategories } from "../src/db/database.js";
+import { styles, colors } from "../src/styles/add.js";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { scheduleSubscriptionNotification } from "./utils/notifications";
+import { scheduleSubscriptionNotification } from "../src/utils/notifications";
+import { getTranslation, getCurrency, getCategoryTranslation } from "../src/translations";
 
 export default function AddScreen() {
+    const params = useLocalSearchParams();
     const [categories, setCategories] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState(null);
 
     const [name, setName] = useState('');
     const [amount, setAmount] = useState('');
+    const [frequency, setFrequency] = useState('Monthly');
     const [nextPaymentDate, setNextPaymentDate] = useState(new Date());
     const [showDatePicker, setShowDatePicker] = useState(false);
+    const language = params.language || 'Turkish';
+    
+    const t = (key) => getTranslation(language, key);
 
     useEffect(() => {
         const getCats = async () => {
@@ -29,8 +35,16 @@ export default function AddScreen() {
     }, []);
 
     const handleSave = async () => {
+        if (!name.trim() || !amount) return;
+        
         try {
-            const newSubscriptionId = await addSubscription(name, parseFloat(amount), nextPaymentDate.toISOString().split('T')[0], selectedCategory);
+            const newSubscriptionId = await addSubscription(
+                name, 
+                parseFloat(amount), 
+                nextPaymentDate.toISOString().split('T')[0], 
+                selectedCategory,
+                frequency
+            );
             await scheduleSubscriptionNotification(newSubscriptionId, name, nextPaymentDate);
             router.back();
         } catch (error) {
@@ -45,21 +59,35 @@ export default function AddScreen() {
         }
     };
 
+    const renderFrequencyOption = (option) => (
+        <TouchableOpacity 
+            style={[styles.billingCycleOption, frequency === option && styles.billingCycleOptionSelected]} 
+            onPress={() => setFrequency(option)}
+        >
+            <Text style={[styles.billingCycleText, frequency === option && styles.billingCycleTextSelected]}>
+                {t(option.toLowerCase())}
+            </Text>
+        </TouchableOpacity>
+    );
+
     return (
-        <View style={styles.container}>
+        <KeyboardAvoidingView 
+            style={styles.container}
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        >
             <View style={styles.header}>
                 <TouchableOpacity onPress={() => router.back()} style={styles.headerButton}>
-                    <MaterialCommunityIcons name="arrow-left" size={24} color={colors.slate200} />
+                    <MaterialCommunityIcons name="arrow-left" size={24} color={colors.white} />
                 </TouchableOpacity>
-                <Text style={styles.headerTitle}>Add Subscription</Text>
+                <Text style={styles.headerTitle}>{t('addSubscription')}</Text>
             </View>
 
-            <View style={styles.main}>
+            <ScrollView style={styles.main} showsVerticalScrollIndicator={false}>
                 <View style={styles.labelContainer}>
-                    <Text style={styles.labelText}>Subscription Name</Text>
+                    <Text style={styles.labelText}>{t('subscriptionName')}</Text>
                     <TextInput
                         style={styles.input}
-                        placeholder="e.g., Spotify"
+                        placeholder={t('namePlaceholder')}
                         placeholderTextColor={colors.slate500}
                         value={name}
                         onChangeText={setName}
@@ -67,71 +95,86 @@ export default function AddScreen() {
                 </View>
 
                 <View style={styles.labelContainer}>
-                    <Text style={styles.labelText}>Amount</Text>
+                    <Text style={styles.labelText}>{t('amount')} ({t(frequency.toLowerCase())})</Text>
                     <TextInput
                         style={styles.input}
-                        placeholder="$10.99"
+                        placeholder={getCurrency(language) + "9.99"}
                         placeholderTextColor={colors.slate500}
                         value={amount}
                         onChangeText={setAmount}
-                        keyboardType="numeric"
+                        keyboardType="decimal-pad"
                     />
                 </View>
 
-
-                <View style={styles.grid}>
-                    <View style={[styles.gridColumn, { marginRight: 12 }]}>
-                        <View style={styles.labelContainer}>
-                            <Text style={styles.labelText}>Next Payment</Text>
-                            <TouchableOpacity onPress={() => setShowDatePicker(true)} style={styles.dateInputContainer}>
-                                <TextInput
-                                    style={styles.input}
-                                    value={nextPaymentDate.toLocaleDateString()}
-                                    editable={false}
-                                />
-                                <MaterialCommunityIcons name="calendar" size={24} style={styles.dateIcon} />
-                            </TouchableOpacity>
-                        </View>
-                        {showDatePicker && (
-                            <DateTimePicker
-                                testID="dateTimePicker"
-                                value={nextPaymentDate}
-                                mode={'date'}
-                                is24Hour={true}
-                                display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-                                onChange={onDateChange}
-                            />
-                        )}
-                    </View>
-                    <View style={styles.gridColumn}>
-                        <View style={styles.labelContainer}>
-                            <Text style={styles.labelText}>Category</Text>
-                            <View style={styles.picker}>
-                                <Picker
-                                    selectedValue={selectedCategory}
-                                    onValueChange={(itemValue) => setSelectedCategory(itemValue)}
-                                    style={{ color: 'white' }}
-                                    dropdownIconColor={colors.primary}
-                                >
-                                    {categories.map((category) => (
-                                        <Picker.Item
-                                            key={category.id}
-                                            label={category.name}
-                                            value={category.id}
-                                        />
-                                    ))}
-                                </Picker>
-                            </View>
-                        </View>
+                <View style={styles.labelContainer}>
+                    <Text style={styles.labelText}>{t('billingCycle')}</Text>
+                    <View style={styles.billingCycleContainer}>
+                        {renderFrequencyOption('Weekly')}
+                        {renderFrequencyOption('Monthly')}
+                        {renderFrequencyOption('Yearly')}
                     </View>
                 </View>
-            </View>
+
+                <View style={styles.labelContainer}>
+                    <Text style={styles.labelText}>{t('nextPaymentDate')}</Text>
+                    <TouchableOpacity onPress={() => setShowDatePicker(true)} style={styles.dateInputContainer}>
+                        <TextInput
+                            style={styles.input}
+                            value={nextPaymentDate.toLocaleDateString('en-US', { 
+                                year: 'numeric', 
+                                month: 'long', 
+                                day: 'numeric' 
+                            })}
+                            editable={false}
+                            pointerEvents="none"
+                        />
+                        <MaterialCommunityIcons name="calendar" size={24} style={styles.dateIcon} />
+                    </TouchableOpacity>
+                </View>
+                
+                {showDatePicker && (
+                    <DateTimePicker
+                        testID="dateTimePicker"
+                        value={nextPaymentDate}
+                        mode={'date'}
+                        is24Hour={true}
+                        display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                        onChange={onDateChange}
+                        minimumDate={new Date()}
+                    />
+                )}
+
+                <View style={styles.labelContainer}>
+                    <Text style={styles.labelText}>{t('category')}</Text>
+                    <View style={styles.picker}>
+                        <Picker
+                            selectedValue={selectedCategory}
+                            onValueChange={(itemValue) => setSelectedCategory(itemValue)}
+                            style={{ color: colors.white }}
+                            dropdownIconColor={colors.primary}
+                        >
+                            {categories.map((category) => (
+                                <Picker.Item
+                                    key={category.id}
+                                    label={getCategoryTranslation(language, category.name)}
+                                    value={category.id}
+                                    color={Platform.OS === 'ios' ? colors.white : colors.backgroundDark}
+                                />
+                            ))}
+                        </Picker>
+                    </View>
+                </View>
+            </ScrollView>
 
             <View style={styles.footer}>
-                <TouchableOpacity style={styles.addButton} onPress={handleSave}>
-                    <Text style={styles.addButtonText}>Add Subscription</Text>
+                <TouchableOpacity 
+                    style={[styles.addButton, (!name.trim() || !amount) && { opacity: 0.5 }]} 
+                    onPress={handleSave}
+                    disabled={!name.trim() || !amount}
+                >
+                    <Text style={styles.addButtonText}>{t('addSubscription')}</Text>
                 </TouchableOpacity>
             </View>
-        </View>
+        </KeyboardAvoidingView>
     );
 }

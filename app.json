@@ -4,7 +4,7 @@
     "slug": "SubTracker",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/Gemini_Generated_Image_ia0g7mia0g7mia0g.png",
+    "icon": "./assets/app-icon.png",
     "scheme": "subtracker",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -15,7 +15,7 @@
       "package": "com.erayoz.subtracker",
       "adaptiveIcon": {
         "backgroundColor": "#0D0C1D",
-        "foregroundImage": "./assets/Gemini_Generated_Image_ia0g7mia0g7mia0g.png"
+        "foregroundImage": "./assets/app-icon.png"
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false

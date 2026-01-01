@@ -7,15 +7,26 @@ export const setupDatabase = async () => {
 
   await db.execAsync(`
     CREATE TABLE IF NOT EXISTS Categories (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL UNIQUE);
-    CREATE TABLE IF NOT EXISTS Subscriptions (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, amount REAL NOT NULL, nextPaymentDate DATE NOT NULL, categoryId INTEGER, FOREIGN KEY (categoryId) REFERENCES Categories (id));
+    CREATE TABLE IF NOT EXISTS Subscriptions (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, amount REAL NOT NULL, nextPaymentDate DATE NOT NULL, categoryId INTEGER, frequency TEXT DEFAULT 'Monthly', FOREIGN KEY (categoryId) REFERENCES Categories (id));
     CREATE TABLE IF NOT EXISTS PaymentHistory (id INTEGER PRIMARY KEY AUTOINCREMENT, subscriptionId INTEGER, name TEXT NOT NULL, amount REAL NOT NULL, paymentDate DATE NOT NULL, categoryId INTEGER, FOREIGN KEY(subscriptionId) REFERENCES Subscriptions(id), FOREIGN KEY(categoryId) REFERENCES Categories(id));
   `);
+
+  // Migration for existing tables
+  try {
+    const tableInfo = await db.getAllAsync("PRAGMA table_info(Subscriptions);");
+    const hasFrequency = tableInfo.some(column => column.name === 'frequency');
+    if (!hasFrequency) {
+      await db.execAsync("ALTER TABLE Subscriptions ADD COLUMN frequency TEXT DEFAULT 'Monthly';");
+    }
+  } catch (e) {
+    console.log("Migration error (column might already exist):", e);
+  }
 };
 
 export const getSubscriptions = async () => {
   if (!db) throw new Error("Veritabanı henüz kurulmadı!");
   const allSubs = await db.getAllAsync(`
-    SELECT s.id, s.name, s.amount, s.nextPaymentDate as next_payment_date, c.name as category_name
+    SELECT s.id, s.name, s.amount, s.nextPaymentDate as next_payment_date, c.name as category_name, s.frequency
     FROM Subscriptions s
     JOIN Categories c ON s.categoryId = c.id
     ORDER BY s.id DESC
@@ -30,11 +41,11 @@ export const getCategories = async () => {
   return allCategories
 }
 
-export const addSubscription = async (name, amount, nextPaymentDate, categoryId) => {
+export const addSubscription = async (name, amount, nextPaymentDate, categoryId, frequency = 'Monthly') => {
   if (!db) throw new Error("Veritabanı henüz kurulmadı!");
   const result = await db.runAsync(
-    'INSERT INTO Subscriptions (name, amount, nextPaymentDate, categoryId) VALUES (?, ?, ?, ?)',
-    [name, amount, nextPaymentDate, categoryId]
+    'INSERT INTO Subscriptions (name, amount, nextPaymentDate, categoryId, frequency) VALUES (?, ?, ?, ?, ?)',
+    [name, amount, nextPaymentDate, categoryId, frequency]
   );
   return result.lastInsertRowId;
 };

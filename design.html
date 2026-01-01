@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SubTracker Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&amp;family=Playfair+Display:ital,wght@0,400..900;1,400..900&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              colors: {
+                "primary": "#6366f1", 
+                "primary-dark": "#4338ca",
+                "background-dark": "#050505", // Extremely dark
+                "surface-dark": "#0f0f11", // Slightly lighter
+                "surface-lighter": "#18181b", // Zinc 800
+                "accent-gold": "#d4af37",
+                "accent-purple": "#a855f7",
+              },
+              fontFamily: {
+                "display": ["Manrope", "sans-serif"],
+                "serif": ["Playfair Display", "serif"],
+              },
+              borderRadius: {"DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "2xl": "2rem", "3xl": "2.5rem", "full": "9999px"},
+              boxShadow: {
+                "glow": "0 0 25px -5px rgba(99, 102, 241, 0.4)",
+                "subtle": "0 10px 30px -10px rgba(0, 0, 0, 0.5)",
+                "premium": "0 20px 40px -10px rgba(0, 0, 0, 0.6)",
+                "float": "0 15px 35px -5px rgba(0, 0, 0, 0.4)",
+              },
+              backgroundImage: {
+                'sheen': 'linear-gradient(145deg, rgba(255,255,255,0.03) 0%, transparent 100%)',
+                'gold-gradient': 'linear-gradient(135deg, #d4af37 0%, #a88b2d 100%)',
+                'dark-gradient': 'linear-gradient(180deg, #0f0f11 0%, #050505 100%)',
+              }
+            },
+          },
+        }
+    </script>
+<style>.no-scrollbar::-webkit-scrollbar {
+    display: none
+    }
+.no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none
+    }
+.bg-noise {
+    background-image: url(https://lh3.googleusercontent.com/aida-public/AB6AXuClxsC6_r1n-h1DPQExVJHACFfdSIb9j9OKs6filgFuIKUXKU_M_2K22VaIuJwY3vBttns3k-nbnuduFFLNxgdnb0RHiFOpUAGvQL7vhbdk0c8cZx_4zoyQHsqCceTjyq8G864_0sK6Vp8FOCvOpjhLtxEeXBiG8Dc63AlDORfMsjw_WmUfHOp73RB4xJqHKb-eYyIGtzAdV3YMrDbAn_BkooeRj_s51obrlpT1qRP8ydGODwlWfRTVu9DxCUb0Mm7zRyUdtYL0esWe)
+    }
+@media (min-width: 768px) {
+    body {
+        background-image: linear-gradient(to bottom, #111, #000);
+        display: flex;
+        align-items: center;
+        justify-content: center
+        }
+    body > main {
+        max-width: 26rem;
+        width: 100%;
+        height: 100%;
+        min-height: 800px;
+        border-radius: 40px;
+        background-color: #000;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 0 0 10px #1a1a1a, 0 0 0 11px #333
+        }
+    .fixed-fab-container {
+        position: absolute;
+        bottom: 2rem;
+        right: 1.5rem;
+        left: auto;
+        width: auto
+        }
+    }
+.glass-morphism {
+    background: rgba(20, 20, 23, 0.6);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08)
+    }@keyframes load {
+    from {
+        width: 0;
+        }
+    }
+.progress-bar-fill {
+    animation: load 1.5s ease-out forwards
+    }</style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-black font-display antialiased text-slate-100 min-h-screen relative selection:bg-indigo-500 selection:text-white">
+<div class="fixed inset-0 w-full h-full overflow-hidden pointer-events-none z-0">
+<div class="absolute top-[-10%] right-[-20%] w-[500px] h-[500px] bg-indigo-900/20 rounded-full blur-[120px] mix-blend-screen"></div>
+<div class="absolute bottom-[10%] left-[-10%] w-[400px] h-[400px] bg-blue-900/10 rounded-full blur-[100px] mix-blend-screen"></div>
+<div class="bg-noise absolute inset-0 w-full h-full opacity-30 pointer-events-none"></div>
+</div>
+<main class="relative z-10 flex flex-col w-full mx-auto bg-background-dark/95 h-full overflow-y-auto no-scrollbar pb-32">
+<header class="flex items-center justify-between px-6 pt-10 pb-6 sticky top-0 z-40 bg-background-dark/80 backdrop-blur-md">
+<div class="flex flex-col">
+<p class="text-slate-400 text-[11px] font-bold tracking-widest uppercase mb-1">Dashboard</p>
+<h1 class="text-2xl font-bold tracking-tight text-white font-serif italic">SubTracker</h1>
+</div>
+<div class="flex items-center gap-3">
+<button class="size-10 rounded-full bg-surface-lighter flex items-center justify-center border border-white/5 hover:bg-white/10 transition-colors">
+<span class="material-symbols-outlined text-[20px] text-slate-300">search</span>
+</button>
+</div>
+</header>
+<div class="px-6 w-full mb-8">
+<div class="relative overflow-hidden rounded-[2rem] bg-surface-dark p-7 shadow-glow border border-white/10 group">
+<div class="absolute inset-0 bg-gradient-to-br from-indigo-500/10 via-transparent to-transparent opacity-50"></div>
+<div class="absolute -right-10 -top-10 w-40 h-40 bg-indigo-500/20 blur-[50px] rounded-full pointer-events-none"></div>
+<div class="relative z-10">
+<div class="flex justify-between items-start mb-6">
+<div>
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/5 border border-white/5 text-[10px] font-semibold text-slate-300 tracking-wide mb-3">
+<span class="size-1.5 rounded-full bg-indigo-400"></span> February 2024
+                            </span>
+<div class="flex items-baseline gap-1">
+<span class="text-4xl font-serif italic text-white">$233</span>
+<span class="text-xl font-serif text-slate-400">.97</span>
+</div>
+<p class="text-xs text-slate-500 mt-1 font-medium">Total monthly spend</p>
+</div>
+<div class="text-right">
+<div class="size-10 rounded-full bg-indigo-500/10 flex items-center justify-center border border-indigo-500/10 mb-1 ml-auto">
+<span class="material-symbols-outlined text-indigo-400 text-[20px]">trending_up</span>
+</div>
+<span class="text-xs font-bold text-indigo-400">+2.5%</span>
+</div>
+</div>
+<div class="grid grid-cols-3 gap-2 pt-5 border-t border-white/5">
+<div class="flex flex-col">
+<span class="text-[10px] text-slate-500 uppercase tracking-wider mb-1">Active</span>
+<span class="text-sm font-bold text-white">4 Subs</span>
+</div>
+<div class="flex flex-col border-l border-white/5 pl-4">
+<span class="text-[10px] text-slate-500 uppercase tracking-wider mb-1">Avg</span>
+<span class="text-sm font-bold text-white">$58.5</span>
+</div>
+<div class="flex flex-col border-l border-white/5 pl-4">
+<span class="text-[10px] text-slate-500 uppercase tracking-wider mb-1">Highest</span>
+<span class="text-sm font-bold text-white">Adobe</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="flex flex-col gap-5 px-6 pb-12">
+<div class="group relative bg-surface-lighter rounded-[1.75rem] p-5 shadow-subtle border border-white/5 overflow-hidden transition-all duration-300 hover:bg-[#1f1f22]">
+<div class="absolute bottom-0 left-0 h-0.5 bg-gradient-to-r from-red-600 to-transparent opacity-50 group-hover:opacity-100 transition-opacity w-[90%]"></div>
+<div class="flex items-center gap-4">
+<div class="relative size-14 shrink-0 rounded-2xl overflow-hidden shadow-lg bg-black group-hover:scale-105 transition-transform duration-300">
+<div class="bg-center bg-no-repeat bg-cover w-full h-full opacity-90" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCd2Zoq4qddYzyYZFZC7Bbr8lPb-qDGXOx1h3ec0-xowqnj8SayVta4YZigWzTozdS6xdIg88-iPeX1_bikZOpsvQxxsHfgvxh7HoXHyJpbmBN5HHhK5MRZqZ5ci2xngnklvw0ftVDRDnh0eSlIhFGDbOIclFOBMf4xwl_VPik8XNVlMaMJpc4kSkVmNatiIP_srdNIysoOj-Y0w5XPMJJFnZqYLQxFj5iQ_X5Uj-qN9bfn53GjrVuwWe9r9QYNvxXbqi2i-kjyFhM3");'></div>
+</div>
+<div class="flex flex-col grow">
+<div class="flex justify-between items-start w-full mb-1">
+<h3 class="text-[17px] font-bold text-white tracking-tight">Netflix</h3>
+<span class="text-[15px] font-bold text-white">$15.99</span>
+</div>
+<div class="flex justify-between items-end w-full">
+<div class="flex flex-col gap-1.5">
+<span class="text-[11px] text-slate-500 font-medium">Premium 4K • Monthly</span>
+<div class="flex items-center gap-2">
+<span class="size-1.5 rounded-full bg-red-500 animate-pulse"></span>
+<span class="text-[10px] text-red-400 font-bold uppercase tracking-wide">Due in 2 days</span>
+</div>
+</div>
+<div class="flex gap-1 opacity-60 group-hover:opacity-100 transition-opacity">
+<button class="size-7 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/20 text-slate-300 transition-colors">
+<span class="material-symbols-outlined text-[14px]">edit</span>
+</button>
+<button class="size-7 flex items-center justify-center rounded-full bg-white/5 hover:bg-red-500/20 text-slate-300 hover:text-red-400 transition-colors">
+<span class="material-symbols-outlined text-[14px]">delete</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="group relative bg-surface-lighter rounded-[1.75rem] p-5 shadow-subtle border border-white/5 overflow-hidden transition-all duration-300 hover:bg-[#1f1f22]">
+<div class="absolute bottom-0 left-0 h-0.5 bg-gradient-to-r from-emerald-500 to-transparent opacity-50 w-[50%]"></div>
+<div class="flex items-center gap-4">
+<div class="relative size-14 shrink-0 rounded-2xl overflow-hidden shadow-lg bg-black group-hover:scale-105 transition-transform duration-300">
+<div class="bg-center bg-no-repeat bg-cover w-full h-full opacity-90" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAvzCV8iMKgK6utZzJpVG5MYy9DsliuybtRxYzxp6Gfh5V4KjvYhdkrY3Cn7VXwfiGLtUl0vNT1m6U-fIFoqVVubnZoS-0Ad-9eMZnvOj5ByIjF7ZweKqozyHYb7A2-A8i4ZnkUzZ6Ybg-TweILWSQUJjXF1odoLHcC2bCOoVG-83AqjmTZpZHli8cswb4lcpmunrmEpXCjzD9_FQ1Re7jNCofj8C9183bnE2AnvBnBu5rXtEJO2oo5Cd54yPerOXM8lSApZZ0T0pNk");'></div>
+</div>
+<div class="flex flex-col grow">
+<div class="flex justify-between items-start w-full mb-1">
+<h3 class="text-[17px] font-bold text-white tracking-tight">Spotify</h3>
+<span class="text-[15px] font-bold text-white">$9.99</span>
+</div>
+<div class="flex justify-between items-end w-full">
+<div class="flex flex-col gap-1.5">
+<span class="text-[11px] text-slate-500 font-medium">Individual • Monthly</span>
+<div class="flex items-center gap-2">
+<span class="size-1.5 rounded-full bg-emerald-500"></span>
+<span class="text-[10px] text-emerald-400 font-bold uppercase tracking-wide">14 days left</span>
+</div>
+</div>
+<div class="flex gap-1 opacity-60 group-hover:opacity-100 transition-opacity">
+<button class="size-7 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/20 text-slate-300 transition-colors">
+<span class="material-symbols-outlined text-[14px]">edit</span>
+</button>
+<button class="size-7 flex items-center justify-center rounded-full bg-white/5 hover:bg-red-500/20 text-slate-300 hover:text-red-400 transition-colors">
+<span class="material-symbols-outlined text-[14px]">delete</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="group relative bg-surface-lighter rounded-[1.75rem] p-5 shadow-subtle border border-white/5 overflow-hidden transition-all duration-300 hover:bg-[#1f1f22]">
+<div class="absolute bottom-0 left-0 h-0.5 bg-gradient-to-r from-purple-500 to-transparent opacity-50 w-[20%]"></div>
+<div class="flex items-center gap-4">
+<div class="relative size-14 shrink-0 rounded-2xl overflow-hidden shadow-lg bg-black group-hover:scale-105 transition-transform duration-300">
+<div class="bg-center bg-no-repeat bg-cover w-full h-full opacity-90" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCepGo8iKi2edK_huq6_CeuWJBK2-Ip_O3K6s5ifq93eHJMY4udOhrVhk7T1gIfjhNKqZS5EWxn9AavwdASxPopO3GJqMfRIohaCZ3pAEV-1UwAwCZvofHIEfX9oetOTBPMTbRCnTXgObzUV91Z50Si3KynYJeEDZNZ-Wbnx6hDpIERFCAjLVWhU08cp5LoYBqTox1xs0bUhuQHkN96fBg11vRNQ1L1jumCcFqIDZQ1AiUdPULj3P0_QJvrrKBJWzGU9IrNLx2e7Yz6");'></div>
+</div>
+<div class="flex flex-col grow">
+<div class="flex justify-between items-start w-full mb-1">
+<h3 class="text-[17px] font-bold text-white tracking-tight">Adobe CC</h3>
+<span class="text-[15px] font-bold text-white">$54.99</span>
+</div>
+<div class="flex justify-between items-end w-full">
+<div class="flex flex-col gap-1.5">
+<span class="text-[11px] text-slate-500 font-medium">All Apps • Monthly</span>
+<div class="flex items-center gap-2">
+<span class="size-1.5 rounded-full bg-purple-500"></span>
+<span class="text-[10px] text-purple-400 font-bold uppercase tracking-wide">25 days left</span>
+</div>
+</div>
+<div class="flex gap-1 opacity-60 group-hover:opacity-100 transition-opacity">
+<button class="size-7 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/20 text-slate-300 transition-colors">
+<span class="material-symbols-outlined text-[14px]">edit</span>
+</button>
+<button class="size-7 flex items-center justify-center rounded-full bg-white/5 hover:bg-red-500/20 text-slate-300 hover:text-red-400 transition-colors">
+<span class="material-symbols-outlined text-[14px]">delete</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="group relative bg-surface-lighter rounded-[1.75rem] p-5 shadow-subtle border border-white/5 overflow-hidden transition-all duration-300 hover:bg-[#1f1f22]">
+<div class="absolute bottom-0 left-0 h-0.5 bg-gradient-to-r from-slate-400 to-transparent opacity-50 w-[10%]"></div>
+<div class="flex items-center gap-4">
+<div class="relative size-14 shrink-0 rounded-2xl overflow-hidden shadow-lg bg-black group-hover:scale-105 transition-transform duration-300">
+<div class="bg-center bg-no-repeat bg-cover w-full h-full opacity-90" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuC4mPDgzMF1J3MV9hSIRAdZ7pCOTUHrPMpAOyr4ECaupQF82umCSPWnTaQydQFOYiZPQnvhjD6scUJqBhGVpMiHJnq4SIwolMFk4TvhWUGchtQzF5aXsyOAbzup1vE2xfU-7Kzb5P48W_5r-TXTXmvsRZNeD5VCqXN6xlrHByN7RZR-Ri0xT1mSB09D693c9wMZf1N73afvXKosIjNOZ41CeLJED3kHqovR8r7W7ExcvaJPH_RvE6lAisAQq1Ve96ywDPyoduVG8sHT");'></div>
+</div>
+<div class="flex flex-col grow">
+<div class="flex justify-between items-start w-full mb-1">
+<h3 class="text-[17px] font-bold text-white tracking-tight">ChatGPT</h3>
+<span class="text-[15px] font-bold text-white">$20.00</span>
+</div>
+<div class="flex justify-between items-end w-full">
+<div class="flex flex-col gap-1.5">
+<span class="text-[11px] text-slate-500 font-medium">Plus • Monthly</span>
+<div class="flex items-center gap-2">
+<span class="size-1.5 rounded-full bg-slate-500"></span>
+<span class="text-[10px] text-slate-400 font-bold uppercase tracking-wide">28 days left</span>
+</div>
+</div>
+<div class="flex gap-1 opacity-60 group-hover:opacity-100 transition-opacity">
+<button class="size-7 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/20 text-slate-300 transition-colors">
+<span class="material-symbols-outlined text-[14px]">edit</span>
+</button>
+<button class="size-7 flex items-center justify-center rounded-full bg-white/5 hover:bg-red-500/20 text-slate-300 hover:text-red-400 transition-colors">
+<span class="material-symbols-outlined text-[14px]">delete</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<div class="fixed-fab-container fixed bottom-8 right-6 z-50 pointer-events-none">
+<button class="pointer-events-auto size-16 rounded-full bg-white text-black shadow-float shadow-indigo-500/20 flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 group relative overflow-hidden">
+<div class="absolute inset-0 bg-gradient-to-tr from-indigo-100 to-white opacity-0 group-hover:opacity-100 transition-opacity"></div>
+<span class="material-symbols-outlined text-[32px] relative z-10 transition-transform group-hover:rotate-90">add</span>
+</button>
+</div>
+</body></html>

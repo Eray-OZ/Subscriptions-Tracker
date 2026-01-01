@@ -1,13 +1,13 @@
 import { Stack } from "expo-router";
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect, useState } from "react";
-import { setupDatabase, getSubscriptions } from "./db/database";
+import { setupDatabase, getSubscriptions } from "../src/db/database";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { 
   setupNotificationHandler, 
   requestNotificationPermissions, 
   rescheduleAllNotifications 
-} from "./utils/notifications";
+} from "../src/utils/notifications";
 
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
@@ -51,7 +51,7 @@ export default function RootLayout() {
   }
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#0D0C1D' }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#050505' }}>
       <Stack
         screenOptions={{
           headerShown: false,
