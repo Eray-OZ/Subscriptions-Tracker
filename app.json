@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "Subscription Tracker",
+    "name": "SubTracker",
     "slug": "SubTracker",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "orientation": "portrait",
     "icon": "./assets/app-icon.png",
     "scheme": "subtracker",
@@ -42,11 +42,36 @@
           }
         }
       ],
-      "expo-sqlite"
+      "expo-sqlite",
+      [
+        "react-native-android-widget",
+        {
+          "widgets": [
+            {
+              "name": "SubscriptionWidget",
+              "label": "Subscription Summary",
+              "minWidth": "250dp",
+              "minHeight": "100dp",
+              "description": "See your monthly spending and next payment.",
+              "previewImage": "./assets/app-icon.png",
+              "resizeMode": "horizontal|vertical",
+              "updatePeriodMillis": 3600000
+            }
+          ]
+        }
+      ],
+      "@react-native-community/datetimepicker",
+      "expo-web-browser"
     ],
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "6abbe652-9599-4d25-897c-91a2661110f6"
+      }
     }
   }
 }

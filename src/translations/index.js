@@ -44,6 +44,12 @@ export const translations = {
     amountPlaceholder: '$9.99',
     nextPaymentDate: 'Next Payment Date',
     category: 'Category',
+    remindMe: 'Remind Me',
+    sameDay: 'Same Day',
+    before1Day: '1 Day Before',
+    before2Days: '2 Days Before',
+    before3Days: '3 Days Before',
+    before1Week: '1 Week Before',
     
     // Payment Modal
     markAsPaid: 'Mark',
@@ -51,11 +57,23 @@ export const translations = {
     nextPayment: 'Next Payment Date',
     cancel: 'Cancel',
     confirm: 'Confirm',
+    edit: 'Edit',
+    delete: 'Delete',
+    freeTrial: 'Free Trial',
+    trialEnds: 'Trial Ends',
+    paymentHistory: 'Payment History',
+    allSubscriptions: 'All Subscriptions',
+    noPaymentHistory: 'No payment history',
+    daysLeft: 'days left',
+    trial: 'Trial',
+    viewHistory: 'View History',
+    isFreeTrial: 'Is this a free trial?',
+    trialEndDate: 'Trial End Date',
   },
   tr: {
     // Dashboard
-    dashboard: 'Kontrol Paneli',
     appName: 'SubTracker',
+    dashboard: 'Kontrol Paneli',
     
     // Summary Card
     totalSpend: 'Toplam',
@@ -96,6 +114,12 @@ export const translations = {
     amountPlaceholder: '₺99.99',
     nextPaymentDate: 'Sonraki Ödeme Tarihi',
     category: 'Kategori',
+    remindMe: 'Hatırlat',
+    sameDay: 'Aynı Gün',
+    before1Day: '1 Gün Önce',
+    before2Days: '2 Gün Önce',
+    before3Days: '3 Gün Önce',
+    before1Week: '1 Hafta Önce',
     
     // Payment Modal
     markAsPaid: 'İşaretle',
@@ -103,6 +127,17 @@ export const translations = {
     nextPayment: 'Sonraki Ödeme Tarihi',
     cancel: 'İptal',
     confirm: 'Onayla',
+    edit: 'Düzenle',
+    delete: 'Sil',
+    freeTrial: 'Ücretsiz Deneme',
+    trialEnds: 'Deneme Bitiyor',
+    paymentHistory: 'Ödeme Geçmişi',
+    allSubscriptions: 'Tüm Abonelikler',
+    noPaymentHistory: 'Ödeme geçmişi yok',
+    trial: 'Deneme',
+    viewHistory: 'Geçmişi Görüntüle',
+    isFreeTrial: 'Bu ücretsiz deneme mi?',
+    trialEndDate: 'Deneme Bitiş Tarihi',
   },
 };
 

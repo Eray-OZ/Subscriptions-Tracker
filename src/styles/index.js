@@ -125,7 +125,6 @@ export const styles = StyleSheet.create({
     width: 160,
     height: 160,
     borderRadius: 80,
-    backgroundColor: 'rgba(99, 102, 241, 0.2)',
   },
   summaryCardHeader: {
     flexDirection: 'row',
@@ -681,5 +680,114 @@ export const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: colors.red400,
+  },
+  
+  // Menu Modal (Long Press)
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.7)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  menuModalContent: {
+    backgroundColor: colors.backgroundDark,
+    width: '80%',
+    borderRadius: 24,
+    padding: 24,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  menuModalTitle: {
+    color: colors.white,
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  menuOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+  },
+  menuOptionText: {
+    color: colors.white,
+    fontSize: 16,
+    marginLeft: 16,
+    fontWeight: '500',
+  },
+
+  // Payment History Modal
+  historyModalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.8)',
+    justifyContent: 'flex-end',
+  },
+  historyModalContainer: {
+    backgroundColor: colors.backgroundDark,
+    height: '80%',
+    borderTopLeftRadius: 32,
+    borderTopRightRadius: 32,
+    padding: 24,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  historyModalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  historyModalTitle: {
+    color: colors.white,
+    fontSize: 24,
+    fontWeight: 'bold',
+  },
+  historySubHeader: {
+    marginBottom: 24,
+    paddingBottom: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+  },
+  historySubName: {
+    color: colors.slate400,
+    fontSize: 16,
+  },
+  historyList: {
+    flex: 1,
+  },
+  historyItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255,255,255,0.05)',
+  },
+  historyItemLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  historyDate: {
+    color: colors.white,
+    fontSize: 16,
+    marginLeft: 12,
+  },
+  historyAmount: {
+    color: colors.emerald400,
+    fontSize: 18,
+    fontWeight: '600',
+  },
+  emptyHistoryContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 60,
+    opacity: 0.5,
+  },
+  emptyHistoryText: {
+    color: colors.slate400,
+    fontSize: 16,
+    marginTop: 16,
   },
 });

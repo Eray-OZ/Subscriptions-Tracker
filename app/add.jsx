@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { View, Text, TextInput, TouchableOpacity, Platform, KeyboardAvoidingView, ScrollView } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, Platform, KeyboardAvoidingView, ScrollView, Switch } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import { router, useLocalSearchParams } from "expo-router";
 import { addSubscription, getCategories } from "../src/db/database.js";
@@ -18,10 +18,22 @@ export default function AddScreen() {
     const [amount, setAmount] = useState('');
     const [frequency, setFrequency] = useState('Monthly');
     const [nextPaymentDate, setNextPaymentDate] = useState(new Date());
+    const [isTrial, setIsTrial] = useState(false);
+    const [trialEndDate, setTrialEndDate] = useState(new Date());
     const [showDatePicker, setShowDatePicker] = useState(false);
     const language = params.language || 'Turkish';
     
+    const [reminderDaysBefore, setReminderDaysBefore] = useState(1);
+    
     const t = (key) => getTranslation(language, key);
+
+    const reminderOptions = [
+        { label: t('sameDay'), value: 0 },
+        { label: t('before1Day'), value: 1 },
+        { label: t('before2Days'), value: 2 },
+        { label: t('before3Days'), value: 3 },
+        { label: t('before1Week'), value: 7 },
+    ];
 
     useEffect(() => {
         const getCats = async () => {
@@ -38,14 +50,20 @@ export default function AddScreen() {
         if (!name.trim() || !amount) return;
         
         try {
+            const dateToUse = isTrial ? trialEndDate : nextPaymentDate;
+            
             const newSubscriptionId = await addSubscription(
                 name, 
                 parseFloat(amount), 
-                nextPaymentDate.toISOString().split('T')[0], 
+                dateToUse.toISOString().split('T')[0], 
                 selectedCategory,
-                frequency
+                frequency,
+                isTrial,
+                isTrial ? dateToUse.toISOString().split('T')[0] : null,
+                reminderDaysBefore
             );
-            await scheduleSubscriptionNotification(newSubscriptionId, name, nextPaymentDate);
+            
+            await scheduleSubscriptionNotification(newSubscriptionId, name, dateToUse, reminderDaysBefore);
             router.back();
         } catch (error) {
             console.error("Error adding subscription:", error);
@@ -55,7 +73,11 @@ export default function AddScreen() {
     const onDateChange = (event, selectedDate) => {
         setShowDatePicker(false);
         if (selectedDate) {
-            setNextPaymentDate(selectedDate);
+            if (isTrial) {
+                setTrialEndDate(selectedDate);
+            } else {
+                setNextPaymentDate(selectedDate);
+            }
         }
     };
 
@@ -94,6 +116,17 @@ export default function AddScreen() {
                     />
                 </View>
 
+                 <View style={[styles.labelContainer, { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }]}>
+                    <Text style={[styles.labelText, { marginBottom: 0 }]}>{t('isFreeTrial')}</Text>
+                    <Switch
+                        trackColor={{ false: "#767577", true: colors.primary }}
+                        thumbColor={colors.white}
+                        ios_backgroundColor="#3e3e3e"
+                        onValueChange={setIsTrial}
+                        value={isTrial}
+                    />
+                </View>
+
                 <View style={styles.labelContainer}>
                     <Text style={styles.labelText}>{t('amount')} ({t(frequency.toLowerCase())})</Text>
                     <TextInput
@@ -114,13 +147,37 @@ export default function AddScreen() {
                         {renderFrequencyOption('Yearly')}
                     </View>
                 </View>
+                
+                <View style={styles.labelContainer}>
+                    <Text style={styles.labelText}>{t('remindMe')}</Text>
+                     <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
+                        {reminderOptions.map((option) => (
+                            <TouchableOpacity
+                                key={option.value}
+                                onPress={() => setReminderDaysBefore(option.value)}
+                                style={[
+                                    styles.billingCycleOption, 
+                                    { paddingHorizontal: 16, minWidth: 80 },
+                                    reminderDaysBefore === option.value && styles.billingCycleOptionSelected
+                                ]}
+                            >
+                                <Text style={[
+                                    styles.billingCycleText, 
+                                    reminderDaysBefore === option.value && styles.billingCycleTextSelected
+                                ]}>
+                                    {option.label}
+                                </Text>
+                            </TouchableOpacity>
+                        ))}
+                    </ScrollView>
+                </View>
 
                 <View style={styles.labelContainer}>
-                    <Text style={styles.labelText}>{t('nextPaymentDate')}</Text>
+                    <Text style={styles.labelText}>{isTrial ? t('trialEndDate') : t('nextPaymentDate')}</Text>
                     <TouchableOpacity onPress={() => setShowDatePicker(true)} style={styles.dateInputContainer}>
                         <TextInput
                             style={styles.input}
-                            value={nextPaymentDate.toLocaleDateString('en-US', { 
+                            value={(isTrial ? trialEndDate : nextPaymentDate).toLocaleDateString('en-US', { 
                                 year: 'numeric', 
                                 month: 'long', 
                                 day: 'numeric' 
@@ -135,7 +192,7 @@ export default function AddScreen() {
                 {showDatePicker && (
                     <DateTimePicker
                         testID="dateTimePicker"
-                        value={nextPaymentDate}
+                        value={isTrial ? trialEndDate : nextPaymentDate}
                         mode={'date'}
                         is24Hour={true}
                         display={Platform.OS === 'ios' ? 'spinner' : 'default'}

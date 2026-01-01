@@ -3,11 +3,15 @@ import * as SplashScreen from 'expo-splash-screen';
 import { useEffect, useState } from "react";
 import { setupDatabase, getSubscriptions } from "../src/db/database";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { 
   setupNotificationHandler, 
   requestNotificationPermissions, 
   rescheduleAllNotifications 
 } from "../src/utils/notifications";
+
+// Register widget task handler
+import '../widget/index';
 
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
@@ -51,12 +55,14 @@ export default function RootLayout() {
   }
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#050505' }}>
-      <Stack
-        screenOptions={{
-          headerShown: false,
-        }}
-      />
-    </SafeAreaView>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <SafeAreaView style={{ flex: 1, backgroundColor: '#050505' }}>
+        <Stack
+          screenOptions={{
+            headerShown: false,
+          }}
+        />
+      </SafeAreaView>
+    </GestureHandlerRootView>
   );
 }

@@ -55,12 +55,12 @@ export const requestNotificationPermissions = async () => {
  * @param {string} name - Subscription name
  * @param {Date|string} paymentDate - Next payment date
  */
-export const scheduleSubscriptionNotification = async (id, name, paymentDate) => {
+export const scheduleSubscriptionNotification = async (id, name, paymentDate, daysBefore = 1) => {
     if (isExpoGo) return null;
 
     try {
         const triggerDate = new Date(paymentDate);
-        triggerDate.setDate(triggerDate.getDate() - 1);
+        triggerDate.setDate(triggerDate.getDate() - daysBefore);
         triggerDate.setHours(9);
         triggerDate.setMinutes(0);
         triggerDate.setSeconds(0);
@@ -120,7 +120,7 @@ export const rescheduleAllNotifications = async (subscriptions) => {
 
         // Schedule notifications for each subscription
         for (const sub of subscriptions) {
-            await scheduleSubscriptionNotification(sub.id, sub.name, sub.next_payment_date);
+            await scheduleSubscriptionNotification(sub.id, sub.name, sub.next_payment_date, sub.reminderDaysBefore);
         }
     } catch (error) {
         console.warn('Failed to reschedule notifications:', error);

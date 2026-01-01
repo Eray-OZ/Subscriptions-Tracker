@@ -1,8 +1,8 @@
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, useEffect } from "react";
 import { FlatList, Text, View, TouchableOpacity, Modal, TextInput, Platform, ScrollView } from "react-native";
 import { Link } from "expo-router";
 import { useFocusEffect } from "@react-navigation/native";
-import { getSubscriptions, getCategories, deleteSubscription, addPaymentToHistory, updateSubscription, updateAmount } from "../src/db/database";
+import { getSubscriptions, getCategories, deleteSubscription, addPaymentToHistory, updateSubscription, updateAmount, getPaymentHistoryBySubscription, getPaymentHistory } from "../src/db/database";
 import { styles, colors } from "../src/styles/index.js";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { LinearGradient } from 'expo-linear-gradient';
@@ -10,6 +10,7 @@ import { isBefore, format, differenceInCalendarDays } from 'date-fns';
 import { tr } from 'date-fns/locale';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { scheduleSubscriptionNotification, cancelSubscriptionNotification } from '../src/utils/notifications';
+import { updateWidgetData } from "../src/utils/widget";
 import { getTranslation, getCurrency, getCategoryTranslation, getFrequencyAbbr } from '../src/translations';
 
 
@@ -102,7 +103,13 @@ const SummaryCard = ({ subscriptions, language }) => {
         const [dollars, cents] = displayTotal.toFixed(2).split('.');
         
         return { total: displayTotal, dollars, cents, count, avg, highest: highestSub, highestAmount, displayLabel };
+
     }, [subscriptions, viewMode, language]);
+
+    // Update widget data when subscriptions change
+    useEffect(() => {
+        updateWidgetData(subscriptions, language);
+    }, [subscriptions, language]);
 
 
     const currentMonth = language === 'Turkish' 
@@ -184,6 +191,12 @@ export default function Index() {
     const [isEditing, setIsEditing] = useState(false)
     const [editingId, setEditingId] = useState(null)
     const [newPrice, setNewPrice] = useState('')
+    
+    // Menu & History states
+    const [isMenuVisible, setMenuVisible] = useState(false);
+    const [isHistoryVisible, setHistoryVisible] = useState(false);
+    const [paymentHistory, setPaymentHistory] = useState([]);
+    const [isGlobalHistory, setIsGlobalHistory] = useState(false);
     
     // Filter states
     const [searchQuery, setSearchQuery] = useState('');
@@ -295,22 +308,48 @@ export default function Index() {
         setNewPaymentDate(currentDate);
     };
 
+    const handleLongPress = (item) => {
+        setSelectedSubscription(item);
+        setMenuVisible(true);
+    };
+
+    const fetchHistory = async () => {
+        if (!selectedSubscription) return;
+        setIsGlobalHistory(false);
+        const history = await getPaymentHistoryBySubscription(selectedSubscription.id);
+        setPaymentHistory(history);
+        setMenuVisible(false);
+        setHistoryVisible(true);
+    };
+
+    const fetchAllHistory = async () => {
+        setIsGlobalHistory(true);
+        const history = await getPaymentHistory();
+        setPaymentHistory(history);
+        setHistoryVisible(true);
+    };
+
     const renderItem = ({ item }) => {
         const today = new Date();
-        const nextPaymentDate = new Date(item.next_payment_date);
-        const remainingDays = differenceInCalendarDays(nextPaymentDate, today);
-        const isPast = isBefore(nextPaymentDate, today);
+        const dateToCheck = item.isTrial && item.trialEndDate ? new Date(item.trialEndDate) : new Date(item.next_payment_date);
+        const remainingDays = differenceInCalendarDays(dateToCheck, today);
+        const isPast = isBefore(dateToCheck, today);
         const statusStyle = getStatusStyle(remainingDays, isPast);
         const isEditingThis = isEditing && editingId === item.id;
 
         return (
-            <View style={styles.subscriptionItem}>
+            <TouchableOpacity 
+                style={styles.subscriptionItem}
+                activeOpacity={0.9}
+                onLongPress={() => handleLongPress(item)}
+                delayLongPress={500}
+            >
                 {/* Status indicator line at bottom */}
                 <View 
                     style={[
                         styles.subscriptionItemIndicator, 
                         { 
-                            backgroundColor: statusStyle.color,
+                            backgroundColor: item.isTrial ? colors.indigo500 : statusStyle.color,
                             width: isPast ? '90%' : `${Math.max(10, Math.min(90, (30 - remainingDays) / 30 * 100))}%`,
                             opacity: 0.5,
                         }
@@ -328,6 +367,12 @@ export default function Index() {
                     <View style={styles.subscriptionInfo}>
                         <View style={styles.subscriptionHeader}>
                             <Text style={styles.subscriptionName}>{item.name}</Text>
+                            {!!item.isTrial && (
+                                <View style={{ backgroundColor: colors.indigo500, paddingHorizontal: 8, paddingVertical: 2, borderRadius: 12, marginLeft: 8 }}>
+                                    <Text style={{ color: 'white', fontSize: 10, fontWeight: 'bold' }}>{t('trial')}</Text>
+                                </View>
+                            )}
+                            <View style={{ flex: 1 }} />
                             {!isEditingThis ? (
                                 <Text style={styles.subscriptionAmount}>
                                     {getCurrency(language)}{item.amount.toFixed(2)}
@@ -353,7 +398,10 @@ export default function Index() {
                         <View style={styles.statusBadge}>
                             <View style={[styles.statusDot, statusStyle.dot]} />
                             <Text style={[styles.statusText, statusStyle.text]}>
-                                {isPast ? t('overdue') : `${remainingDays} ${t('daysLeft')}`}
+                                {item.isTrial 
+                                    ? (isPast ? t('trialEnds') : `${remainingDays} ${t('daysLeft')}`)
+                                    : (isPast ? t('overdue') : `${remainingDays} ${t('daysLeft')}`)
+                                }
                             </Text>
                         </View>
                     </View>
@@ -397,9 +445,9 @@ export default function Index() {
                         </TouchableOpacity>
                     </View>
                 </View>
-            </View>
+            </TouchableOpacity>
         );
-    }
+    };
 
     return (
         <View style={styles.container}>
@@ -450,7 +498,124 @@ export default function Index() {
                 </View>
             </Modal>
 
-            {/* Filter Modal */}
+            {/* Menu Modal (Long Press) */}
+            <Modal
+                animationType="fade"
+                transparent={true}
+                visible={isMenuVisible}
+                onRequestClose={() => setMenuVisible(false)}
+            >
+                <TouchableOpacity 
+                    style={styles.modalOverlay} 
+                    activeOpacity={1} 
+                    onPress={() => setMenuVisible(false)}
+                >
+                    <View style={styles.menuModalContent}>
+                        <Text style={styles.menuModalTitle}>{selectedSubscription?.name}</Text>
+                        
+                        <TouchableOpacity style={styles.menuOption} onPress={fetchHistory}>
+                            <MaterialCommunityIcons name="history" size={24} color={colors.primary} />
+                            <Text style={styles.menuOptionText}>{t('viewHistory')}</Text>
+                        </TouchableOpacity>
+                        
+                        <TouchableOpacity 
+                            style={styles.menuOption} 
+                            onPress={() => { 
+                                setMenuVisible(false); 
+                                if (selectedSubscription) {
+                                    openModal(selectedSubscription); 
+                                }
+                            }}
+                        >
+                            <MaterialCommunityIcons name="check-circle-outline" size={24} color={colors.emerald500} />
+                            <Text style={styles.menuOptionText}>{t('markAsPaid')}</Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity 
+                            style={styles.menuOption} 
+                            onPress={() => { 
+                                if (selectedSubscription) {
+                                    setMenuVisible(false);
+                                    setIsEditing(true);
+                                    setEditingId(selectedSubscription.id);
+                                    setNewPrice(selectedSubscription.amount ? selectedSubscription.amount.toString() : '');
+                                }
+                            }}
+                        >
+                            <MaterialCommunityIcons name="pencil" size={24} color={colors.slate400} />
+                            <Text style={styles.menuOptionText}>{t('edit')}</Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity 
+                            style={[styles.menuOption, { borderBottomWidth: 0 }]} 
+                            onPress={() => { 
+                                if (selectedSubscription) {
+                                    setMenuVisible(false); 
+                                    handleDelete(selectedSubscription.id); 
+                                }
+                            }}
+                        >
+                            <MaterialCommunityIcons name="delete" size={24} color={colors.red500} />
+                            <Text style={[styles.menuOptionText, { color: colors.red500 }]}>{t('delete')}</Text>
+                        </TouchableOpacity>
+                    </View>
+                </TouchableOpacity>
+            </Modal>
+
+            {/* Payment History Modal */}
+            <Modal
+                animationType="slide"
+                transparent={true}
+                visible={isHistoryVisible}
+                onRequestClose={() => setHistoryVisible(false)}
+            >
+                <View style={styles.historyModalOverlay}>
+                    <View style={styles.historyModalContainer}>
+                        <View style={styles.historyModalHeader}>
+                            <Text style={styles.historyModalTitle}>
+                                {isGlobalHistory ? t('paymentHistory') : t('paymentHistory')}
+                            </Text>
+                            <TouchableOpacity onPress={() => setHistoryVisible(false)}>
+                                <MaterialCommunityIcons name="close" size={24} color={colors.white} />
+                            </TouchableOpacity>
+                        </View>
+                        <View style={styles.historySubHeader}>
+                            <Text style={styles.historySubName}>
+                                {isGlobalHistory ? t('allSubscriptions') : selectedSubscription?.name}
+                            </Text>
+                        </View>
+
+                        <ScrollView style={styles.historyList} showsVerticalScrollIndicator={false}>
+                            {paymentHistory.length === 0 ? (
+                                <View style={styles.emptyHistoryContainer}>
+                                    <MaterialCommunityIcons name="history" size={48} color={colors.slate700} />
+                                    <Text style={styles.emptyHistoryText}>{t('noPaymentHistory')}</Text>
+                                </View>
+                            ) : (
+                                paymentHistory.map((payment, index) => (
+                                    <View key={index} style={styles.historyItem}>
+                                        <View style={styles.historyItemLeft}>
+                                            <MaterialCommunityIcons name="calendar-check" size={20} color={colors.emerald500} />
+                                            <View style={{ marginLeft: 12 }}>
+                                                {isGlobalHistory && (
+                                                    <Text style={{ color: colors.white, fontWeight: 'bold', fontSize: 16, marginBottom: 4 }}>
+                                                        {payment.name}
+                                                    </Text>
+                                                )}
+                                                <Text style={[styles.historyDate, { marginLeft: 0 }]}>
+                                                    {format(new Date(payment.paymentDate), 'd MMMM yyyy', language === 'Turkish' ? { locale: tr } : {})}
+                                                </Text>
+                                            </View>
+                                        </View>
+                                        <Text style={styles.historyAmount}>{getCurrency(language)}{payment.amount.toFixed(2)}</Text>
+                                    </View>
+                                ))
+                            )}
+                        </ScrollView>
+                    </View>
+                </View>
+            </Modal>
+
             <Modal
                 animationType="slide"
                 transparent={true}
@@ -587,9 +752,14 @@ export default function Index() {
                     <Text style={styles.headerLabel}>{t('dashboard')}</Text>
                     <Text style={styles.headerTitle}>{t('appName')}</Text>
                 </View>
-                <TouchableOpacity style={styles.searchButton} onPress={() => setFilterModalVisible(true)}>
-                    <MaterialCommunityIcons name="filter-variant" size={22} color={colors.white} />
-                </TouchableOpacity>
+                <View style={{ flexDirection: 'row', gap: 12 }}>
+                    <TouchableOpacity style={[styles.searchButton, { backgroundColor: colors.indigo500 }]} onPress={fetchAllHistory}>
+                        <MaterialCommunityIcons name="history" size={24} color={colors.white} />
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.searchButton} onPress={() => setFilterModalVisible(true)}>
+                        <MaterialCommunityIcons name="filter-variant" size={22} color={colors.white} />
+                    </TouchableOpacity>
+                </View>
             </View>
 
             <FlatList
