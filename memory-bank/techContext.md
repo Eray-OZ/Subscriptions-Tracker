@@ -88,7 +88,7 @@ Subscriptions-Tracker/
 
 ```sql
 Categories (id, name)
-Subscriptions (id, name, amount, nextPaymentDate, categoryId)
+Subscriptions (id, name, amount, nextPaymentDate, categoryId, frequency, isTrial, trialEndDate, reminderDaysBefore, reminderHour, reminderMinute)
 PaymentHistory (id, subscriptionId, name, amount, paymentDate, categoryId)
 ```
 

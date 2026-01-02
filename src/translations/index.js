@@ -50,6 +50,7 @@ export const translations = {
     before2Days: '2 Days Before',
     before3Days: '3 Days Before',
     before1Week: '1 Week Before',
+    notificationTime: 'Notification Time',
     
     // Payment Modal
     markAsPaid: 'Mark',
@@ -131,6 +132,7 @@ export const translations = {
     before2Days: '2 Gün Önce',
     before3Days: '3 Gün Önce',
     before1Week: '1 Hafta Önce',
+    notificationTime: 'Bildirim Saati',
     
     // Payment Modal
     markAsPaid: 'İşaretle',

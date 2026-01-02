@@ -21,10 +21,15 @@ export default function AddScreen() {
     const [isTrial, setIsTrial] = useState(false);
     const [trialEndDate, setTrialEndDate] = useState(new Date());
     const [showDatePicker, setShowDatePicker] = useState(false);
+    const [showTimePicker, setShowTimePicker] = useState(false);
     const language = params.language || 'Turkish';
     
     const [reminderDaysBefore, setReminderDaysBefore] = useState(1);
-    
+    const [reminderTime, setReminderTime] = useState(() => {
+        const date = new Date();
+        date.setHours(11, 30, 0, 0);
+        return date;
+    });    
     const t = (key) => getTranslation(language, key);
 
     const reminderOptions = [
@@ -51,6 +56,8 @@ export default function AddScreen() {
         
         try {
             const dateToUse = isTrial ? trialEndDate : nextPaymentDate;
+            const reminderHour = reminderTime.getHours();
+            const reminderMinute = reminderTime.getMinutes();
             
             const newSubscriptionId = await addSubscription(
                 name, 
@@ -60,10 +67,12 @@ export default function AddScreen() {
                 frequency,
                 isTrial,
                 isTrial ? dateToUse.toISOString().split('T')[0] : null,
-                reminderDaysBefore
+                reminderDaysBefore,
+                reminderHour,
+                reminderMinute
             );
             
-            await scheduleSubscriptionNotification(newSubscriptionId, name, dateToUse, reminderDaysBefore);
+            await scheduleSubscriptionNotification(newSubscriptionId, name, dateToUse, reminderDaysBefore, reminderHour, reminderMinute);
             router.back();
         } catch (error) {
             console.error("Error adding subscription:", error);
@@ -78,6 +87,13 @@ export default function AddScreen() {
             } else {
                 setNextPaymentDate(selectedDate);
             }
+        }
+    };
+
+    const onTimeChange = (event, selectedTime) => {
+        setShowTimePicker(false);
+        if (selectedTime) {
+            setReminderTime(selectedTime);
         }
     };
 
@@ -173,6 +189,19 @@ export default function AddScreen() {
                 </View>
 
                 <View style={styles.labelContainer}>
+                    <Text style={styles.labelText}>{t('notificationTime')}</Text>
+                    <TouchableOpacity onPress={() => setShowTimePicker(true)} style={styles.dateInputContainer}>
+                        <TextInput
+                            style={styles.input}
+                            value={reminderTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            editable={false}
+                            pointerEvents="none"
+                        />
+                        <MaterialCommunityIcons name="clock-outline" size={24} style={styles.dateIcon} />
+                    </TouchableOpacity>
+                </View>
+
+                <View style={styles.labelContainer}>
                     <Text style={styles.labelText}>{isTrial ? t('trialEndDate') : t('nextPaymentDate')}</Text>
                     <TouchableOpacity onPress={() => setShowDatePicker(true)} style={styles.dateInputContainer}>
                         <TextInput
@@ -198,6 +227,17 @@ export default function AddScreen() {
                         display={Platform.OS === 'ios' ? 'spinner' : 'default'}
                         onChange={onDateChange}
                         minimumDate={new Date()}
+                    />
+                )}
+
+                {showTimePicker && (
+                    <DateTimePicker
+                        testID="timePicker"
+                        value={reminderTime}
+                        mode={'time'}
+                        is24Hour={true}
+                        display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                        onChange={onTimeChange}
                     />
                 )}
 

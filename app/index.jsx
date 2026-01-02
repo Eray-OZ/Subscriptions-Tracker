@@ -311,7 +311,14 @@ export default function Index() {
                 updateSubscription(selectedSubscription.id, format(newPaymentDate, 'yyyy-MM-dd'))
             ]);
 
-            await scheduleSubscriptionNotification(selectedSubscription.id, selectedSubscription.name, newPaymentDate);
+            await scheduleSubscriptionNotification(
+                selectedSubscription.id, 
+                selectedSubscription.name, 
+                newPaymentDate,
+                selectedSubscription.reminderDaysBefore,
+                selectedSubscription.reminderHour,
+                selectedSubscription.reminderMinute
+            );
 
             setModalVisible(false);
             fetchSubscriptions();

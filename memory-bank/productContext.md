@@ -44,6 +44,8 @@ When a subscription is past due:
 ### Notification Logic
 
 - Notifications fire based on user preference (same day, 1/2/3 days, or 1 week before)
+- **Time Selection**: Users can choose a custom notification time (default: 11:30 AM)
+- Each subscription has a unique notification ID (`subscription-{id}`)
 - Each subscription has a unique notification ID (`subscription-{id}`)
 - On app launch, all notifications are rescheduled to stay in sync
 

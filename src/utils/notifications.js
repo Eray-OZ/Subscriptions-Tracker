@@ -55,14 +55,14 @@ export const requestNotificationPermissions = async () => {
  * @param {string} name - Subscription name
  * @param {Date|string} paymentDate - Next payment date
  */
-export const scheduleSubscriptionNotification = async (id, name, paymentDate, daysBefore = 1) => {
+export const scheduleSubscriptionNotification = async (id, name, paymentDate, daysBefore = 1, hour = 11, minute = 30) => {
     if (isExpoGo) return null;
 
     try {
         const triggerDate = new Date(paymentDate);
         triggerDate.setDate(triggerDate.getDate() - daysBefore);
-        triggerDate.setHours(9);
-        triggerDate.setMinutes(0);
+        triggerDate.setHours(hour);
+        triggerDate.setMinutes(minute);
         triggerDate.setSeconds(0);
 
         // Don't schedule if the trigger date is in the past
@@ -70,10 +70,22 @@ export const scheduleSubscriptionNotification = async (id, name, paymentDate, da
             return null;
         }
 
+        // Dynamic message based on daysBefore
+        let timeMessage;
+        if (daysBefore === 0) {
+            timeMessage = 'is due today';
+        } else if (daysBefore === 1) {
+            timeMessage = 'is due tomorrow';
+        } else if (daysBefore === 7) {
+            timeMessage = 'is due in one week';
+        } else {
+            timeMessage = `is due in ${daysBefore} days`;
+        }
+
         await Notifications.scheduleNotificationAsync({
             content: {
                 title: "Subscription Reminder 💳",
-                body: `Your ${name} subscription is due tomorrow.`,
+                body: `Your ${name} subscription ${timeMessage}.`,
             },
             trigger: {
                 type: 'date',
@@ -120,7 +132,14 @@ export const rescheduleAllNotifications = async (subscriptions) => {
 
         // Schedule notifications for each subscription
         for (const sub of subscriptions) {
-            await scheduleSubscriptionNotification(sub.id, sub.name, sub.next_payment_date, sub.reminderDaysBefore);
+            await scheduleSubscriptionNotification(
+                sub.id, 
+                sub.name, 
+                sub.next_payment_date, 
+                sub.reminderDaysBefore ?? 1,
+                sub.reminderHour ?? 11,
+                sub.reminderMinute ?? 30
+            );
         }
     } catch (error) {
         console.warn('Failed to reschedule notifications:', error);
