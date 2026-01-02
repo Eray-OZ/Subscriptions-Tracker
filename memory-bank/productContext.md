@@ -62,4 +62,11 @@ When a subscription is past due:
 ### Language Support
 
 - Turkish and English
-- Language preference persists across app restarts (AsyncStorage)
+- Language preference persists across app restarts (SecureStore)
+
+### UI Polish
+
+- Empty state with indigo inbox icon when no subscriptions
+- Payment date shown on each subscription card
+- Free trials excluded from summary card totals
+- Improved touch feedback on cards

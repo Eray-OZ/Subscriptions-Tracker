@@ -67,9 +67,12 @@ const SummaryCard = ({ subscriptions, language }) => {
         let displayLabel = 'spend';
         let filteredSubs = [];
 
+        // Filter out free trials from calculations
+        const paidSubscriptions = subscriptions.filter(sub => !sub.isTrial);
+
         if (viewMode === 'Total') {
             // Normalize all amounts to Monthly, then display
-            const normalizedSubs = subscriptions.map(sub => {
+            const normalizedSubs = paidSubscriptions.map(sub => {
                 let monthlyAmount = sub.amount;
                 if (sub.frequency === 'Weekly') monthlyAmount = sub.amount * 4.33;
                 else if (sub.frequency === 'Yearly') monthlyAmount = sub.amount / 12;
@@ -83,7 +86,7 @@ const SummaryCard = ({ subscriptions, language }) => {
             displayLabel = t('monthlySpendTotal');
         } else {
             // Filter by frequency and show raw amounts
-            filteredSubs = subscriptions.filter(sub => sub.frequency === viewMode);
+            filteredSubs = paidSubscriptions.filter(sub => sub.frequency === viewMode);
             displayTotal = filteredSubs.reduce((sum, sub) => sum + sub.amount, 0);
             displayLabel = viewMode === 'Weekly' ? t('weeklySpend') : viewMode === 'Monthly' ? t('monthlySpend') : t('yearlySpend');
         }
@@ -356,7 +359,7 @@ export default function Index() {
         return (
             <TouchableOpacity 
                 style={styles.subscriptionItem}
-                activeOpacity={0.9}
+                activeOpacity={0.7}
                 onLongPress={() => handleLongPress(item)}
                 delayLongPress={500}
             >
@@ -409,7 +412,9 @@ export default function Index() {
                             )}
                         </View>
                         
-                        <Text style={styles.subscriptionMeta}>{getCategoryTranslation(language, item.category_name)} • {item.frequency ? t(item.frequency.toLowerCase()) : t('monthly')}</Text>
+                        <Text style={styles.subscriptionMeta}>
+                            {getCategoryTranslation(language, item.category_name)} • {format(dateToCheck, 'd MMM', language === 'Turkish' ? { locale: tr } : {})}
+                        </Text>
                         
                         <View style={styles.statusBadge}>
                             <View style={[styles.statusDot, statusStyle.dot]} />
@@ -770,7 +775,7 @@ export default function Index() {
                 </View>
                 <View style={{ flexDirection: 'row', gap: 12 }}>
                     <Link href={{ pathname: "/calendar", params: { language } }} asChild>
-                        <TouchableOpacity style={[styles.searchButton, { backgroundColor: colors.emerald500 }]}>
+                        <TouchableOpacity style={styles.searchButton}>
                             <MaterialCommunityIcons name="calendar-month" size={22} color={colors.white} />
                         </TouchableOpacity>
                     </Link>
@@ -788,8 +793,19 @@ export default function Index() {
                 renderItem={renderItem}
                 keyExtractor={(item) => item.id.toString()}
                 style={styles.main}
-                contentContainerStyle={{ paddingBottom: 120 }}
+                contentContainerStyle={{ paddingBottom: 120, flexGrow: 1 }}
                 ListHeaderComponent={<SummaryCard subscriptions={filteredSubscriptions} language={language} />}
+                ListEmptyComponent={
+                    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', paddingVertical: 60 }}>
+                        <MaterialCommunityIcons name="inbox-outline" size={80} color={colors.indigo400} />
+                        <Text style={{ color: colors.slate400, fontSize: 18, marginTop: 16, fontWeight: '600' }}>
+                            {t('noSubscriptions') || 'No subscriptions yet'}
+                        </Text>
+                        <Text style={{ color: colors.slate500, fontSize: 14, marginTop: 8, textAlign: 'center', paddingHorizontal: 40 }}>
+                            {t('addFirstSubscription') || 'Tap the + button to track your first subscription'}
+                        </Text>
+                    </View>
+                }
             />
 
             {/* FAB Button */}

@@ -11,7 +11,7 @@
 | Animations    | Reanimated                  | ~4.1    |
 | Date Handling | date-fns                    | ^4.1    |
 | Calendar      | react-native-calendars      | latest  |
-| Storage       | AsyncStorage                | latest  |
+| Storage       | expo-secure-store           | latest  |
 | Widget        | react-native-android-widget | ^0.17   |
 | Build         | EAS Build                   | Managed |
 

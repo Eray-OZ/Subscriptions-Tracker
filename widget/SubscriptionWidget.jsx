@@ -2,85 +2,67 @@ import React from 'react';
 import { FlexWidget, TextWidget } from 'react-native-android-widget';
 
 export function SubscriptionWidget({ totalMonthly, nextPaymentName, nextPaymentDate, currencySymbol }) {
+  // Ensure we have fallback values
+  const displayTotal = totalMonthly || '0.00';
+  const displayCurrency = currencySymbol || '₺';
+  const displayName = nextPaymentName || 'No upcoming';
+  const displayDate = nextPaymentDate || '';
+
   return (
     <FlexWidget
       style={{
         height: 'match_parent',
         width: 'match_parent',
-        backgroundColor: '#050505',
+        backgroundColor: '#0a0a0a',
         padding: 16,
         flexDirection: 'column',
-        justifyContent: 'space-between',
-        borderRadius: 16
+        justifyContent: 'center',
+        alignItems: 'flex-start',
+        borderRadius: 16,
       }}
     >
-      <FlexWidget style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: 'match_parent' }}>
-        <TextWidget
-            text="SubTracker"
-            style={{
-            color: '#818cf8', // indigo-400
-            fontSize: 14,
-            fontWeight: 'bold'
-            }}
-        />
-      </FlexWidget>
+      <TextWidget
+        text="SubTracker"
+        style={{
+          color: '#818cf8',
+          fontSize: 12,
+        }}
+      />
       
-      <FlexWidget style={{ flexDirection: 'column' }}>
+      <TextWidget
+        text={`${displayCurrency}${displayTotal}`}
+        style={{
+          color: '#ffffff',
+          fontSize: 32,
+          fontWeight: 'bold',
+        }}
+      />
+      
+      <TextWidget
+        text="per month"
+        style={{
+          color: '#64748b',
+          fontSize: 12,
+        }}
+      />
+
+      <FlexWidget
+        style={{
+          marginTop: 12,
+          backgroundColor: '#1a1a2e',
+          padding: 8,
+          borderRadius: 8,
+          width: 'match_parent',
+        }}
+      >
         <TextWidget
-          text="Monthly Spend"
+          text={`Next: ${displayName}`}
           style={{
-            color: '#94a3b8', // slate-400
+            color: '#10b981',
             fontSize: 12,
-            marginBottom: 4
-          }}
-        />
-        <TextWidget
-          text={`${currencySymbol}${totalMonthly}`}
-          style={{
-            color: '#ffffff',
-            fontSize: 28,
-            fontWeight: 'bold'
           }}
         />
       </FlexWidget>
-
-      {nextPaymentName ? (
-        <FlexWidget style={{ flexDirection: 'column', backgroundColor: '#1e1e2e', padding: 8, borderRadius: 8, width: 'match_parent' }}>
-          <TextWidget
-            text="Upcoming"
-            style={{
-              color: '#94a3b8',
-              fontSize: 10,
-              marginBottom: 2
-            }}
-          />
-           <FlexWidget style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', width: 'match_parent' }}>
-             <TextWidget
-              text={nextPaymentName}
-              style={{
-                color: '#ffffff',
-                fontSize: 14,
-                fontWeight: 'bold',
-                width: '60%'
-              }}
-              maxLines={1}
-            />
-             <TextWidget
-              text={nextPaymentDate}
-              style={{
-                color: '#fbbf24', // amber-400
-                fontSize: 12,
-                textAlign: 'right'
-              }}
-            />
-           </FlexWidget>
-        </FlexWidget>
-      ) : (
-        <TextWidget 
-            text="No upcoming payments" 
-            style={{ color: '#64748b', fontSize: 12 }} 
-        />
-      )}
     </FlexWidget>
   );
 }

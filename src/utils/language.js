@@ -1,21 +1,38 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
+// In-memory storage fallback when native modules aren't available (Expo Go)
+let cachedLanguage = 'Turkish';
 
-const LANGUAGE_KEY = '@subtracker_language';
+// Try to use SecureStore if available, otherwise use memory
+let SecureStore = null;
+try {
+  SecureStore = require('expo-secure-store');
+} catch (e) {
+  // SecureStore not available (Expo Go without dev build)
+}
+
+const LANGUAGE_KEY = 'subtracker_language';
 
 export const saveLanguage = async (language) => {
-  try {
-    await AsyncStorage.setItem(LANGUAGE_KEY, language);
-  } catch (error) {
-    console.warn('Failed to save language:', error);
+  cachedLanguage = language;
+  if (SecureStore) {
+    try {
+      await SecureStore.setItemAsync(LANGUAGE_KEY, language);
+    } catch (error) {
+      // Silently fail - will use memory cache
+    }
   }
 };
 
 export const loadLanguage = async () => {
-  try {
-    const language = await AsyncStorage.getItem(LANGUAGE_KEY);
-    return language || 'Turkish'; // Default to Turkish
-  } catch (error) {
-    console.warn('Failed to load language:', error);
-    return 'Turkish';
+  if (SecureStore) {
+    try {
+      const language = await SecureStore.getItemAsync(LANGUAGE_KEY);
+      if (language) {
+        cachedLanguage = language;
+        return language;
+      }
+    } catch (error) {
+      // Silently fail - will use cached value
+    }
   }
+  return cachedLanguage;
 };

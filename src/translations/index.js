@@ -76,6 +76,10 @@ export const translations = {
     noPaymentsThisDay: 'No payments scheduled',
     normalPayment: 'Payment',
     highSpend: '$100+',
+    
+    // Empty State
+    noSubscriptions: 'No subscriptions yet',
+    addFirstSubscription: 'Tap the + button to track your first subscription',
   },
   tr: {
     // Dashboard
@@ -152,6 +156,10 @@ export const translations = {
     noPaymentsThisDay: 'Planlanmış ödeme yok',
     normalPayment: 'Ödeme',
     highSpend: '₺100+',
+    
+    // Empty State
+    noSubscriptions: 'Henüz abonelik yok',
+    addFirstSubscription: 'İlk aboneliğinizi eklemek için + butonuna dokunun',
   },
 };
 

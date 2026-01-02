@@ -1,5 +1,5 @@
 import { useState, useCallback, useMemo } from "react";
-import { View, Text, TouchableOpacity, Modal, ScrollView } from "react-native";
+import { View, Text, TouchableOpacity, ScrollView } from "react-native";
 import { Link, useFocusEffect, useLocalSearchParams } from "expo-router";
 import { Calendar, LocaleConfig } from "react-native-calendars";
 import { getSubscriptions } from "../src/db/database";
@@ -24,7 +24,6 @@ export default function CalendarScreen() {
   
   const [subscriptions, setSubscriptions] = useState([]);
   const [selectedDate, setSelectedDate] = useState(null);
-  const [showDayModal, setShowDayModal] = useState(false);
 
   const t = (key) => getTranslation(language, key);
 
@@ -76,22 +75,11 @@ export default function CalendarScreen() {
     Object.keys(paymentDates).forEach(dateStr => {
       const isSelected = selectedDate === dateStr;
       
+      // Payment dates get a visible solid background
       marked[dateStr] = {
-        marked: true,
-        dotColor: colors.emerald500,
-        selected: isSelected,
-        selectedColor: isSelected ? colors.indigo500 : colors.emerald500 + '40', // 40 = 25% opacity
-        selectedTextColor: colors.white,
-        customStyles: {
-          container: {
-            backgroundColor: isSelected ? colors.indigo500 : colors.emerald500 + '30',
-            borderRadius: 8,
-          },
-          text: {
-            color: colors.white,
-            fontWeight: 'bold',
-          }
-        }
+        selected: true, // Use selected styling for solid background
+        selectedColor: isSelected ? colors.indigo500 : colors.emerald500,
+        selectedTextColor: isSelected ? colors.white : '#000000', // Black text on green for contrast
       };
     });
 
@@ -100,6 +88,7 @@ export default function CalendarScreen() {
       marked[selectedDate] = {
         selected: true,
         selectedColor: colors.indigo500,
+        selectedTextColor: colors.white,
       };
     }
 
@@ -227,67 +216,6 @@ export default function CalendarScreen() {
           )}
         </View>
       )}
-
-      {/* Day Detail Modal */}
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={showDayModal}
-        onRequestClose={() => setShowDayModal(false)}
-      >
-        <View style={styles.historyModalOverlay}>
-          <View style={styles.historyModalContainer}>
-            <View style={styles.historyModalHeader}>
-              <Text style={styles.historyModalTitle}>
-                {selectedDate && format(new Date(selectedDate), 'd MMMM', language === 'Turkish' ? { locale: tr } : {})}
-              </Text>
-              <TouchableOpacity onPress={() => setShowDayModal(false)}>
-                <MaterialCommunityIcons name="close" size={24} color={colors.white} />
-              </TouchableOpacity>
-            </View>
-            
-            <ScrollView style={styles.historyList}>
-              {selectedDayPayments?.payments.map((payment, index) => (
-                <View key={index} style={styles.historyItem}>
-                  <View style={styles.historyItemLeft}>
-                    <MaterialCommunityIcons 
-                      name={payment.isTrial ? "gift" : "calendar-check"} 
-                      size={20} 
-                      color={payment.isTrial ? colors.indigo400 : colors.emerald500} 
-                    />
-                    <View style={{ marginLeft: 12 }}>
-                      <Text style={{ color: colors.white, fontWeight: 'bold', fontSize: 16 }}>
-                        {payment.name}
-                      </Text>
-                      <Text style={{ color: colors.slate400, fontSize: 12 }}>
-                        {getCategoryTranslation(language, payment.category)}
-                      </Text>
-                    </View>
-                  </View>
-                  <Text style={styles.historyAmount}>
-                    {getCurrency(language)}{payment.amount.toFixed(2)}
-                  </Text>
-                </View>
-              ))}
-            </ScrollView>
-
-            {/* Total */}
-            <View style={{ 
-              borderTopWidth: 1, 
-              borderTopColor: colors.slate700, 
-              paddingTop: 16, 
-              marginTop: 8,
-              flexDirection: 'row',
-              justifyContent: 'space-between'
-            }}>
-              <Text style={{ color: colors.slate400, fontSize: 16 }}>{t('total') || 'Total'}</Text>
-              <Text style={{ color: colors.white, fontSize: 20, fontWeight: 'bold' }}>
-                {getCurrency(language)}{selectedDayPayments?.total.toFixed(2)}
-              </Text>
-            </View>
-          </View>
-        </View>
-      </Modal>
     </View>
   );
 }
