@@ -69,6 +69,13 @@ export const translations = {
     viewHistory: 'View History',
     isFreeTrial: 'Is this a free trial?',
     trialEndDate: 'Trial End Date',
+    
+    // Calendar
+    calendar: 'Calendar',
+    payments: 'payment(s)',
+    noPaymentsThisDay: 'No payments scheduled',
+    normalPayment: 'Payment',
+    highSpend: '$100+',
   },
   tr: {
     // Dashboard
@@ -138,6 +145,13 @@ export const translations = {
     viewHistory: 'Geçmişi Görüntüle',
     isFreeTrial: 'Bu ücretsiz deneme mi?',
     trialEndDate: 'Deneme Bitiş Tarihi',
+    
+    // Calendar
+    calendar: 'Takvim',
+    payments: 'ödeme',
+    noPaymentsThisDay: 'Planlanmış ödeme yok',
+    normalPayment: 'Ödeme',
+    highSpend: '₺100+',
   },
 };
 

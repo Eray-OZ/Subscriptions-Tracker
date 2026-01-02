@@ -8,12 +8,10 @@ export function SubscriptionWidget({ totalMonthly, nextPaymentName, nextPaymentD
         height: 'match_parent',
         width: 'match_parent',
         backgroundColor: '#050505',
-        borderRadius: 16,
         padding: 16,
         flexDirection: 'column',
         justifyContent: 'space-between',
-        borderColor: '#333333',
-        borderWidth: 2
+        borderRadius: 16
       }}
     >
       <FlexWidget style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: 'match_parent' }}>

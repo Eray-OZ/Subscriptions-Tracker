@@ -43,6 +43,23 @@ When a subscription is past due:
 
 ### Notification Logic
 
-- Notifications fire at **9:00 AM**, one day before payment
+- Notifications fire based on user preference (same day, 1/2/3 days, or 1 week before)
 - Each subscription has a unique notification ID (`subscription-{id}`)
 - On app launch, all notifications are rescheduled to stay in sync
+
+### Calendar View
+
+- Month calendar with payment date highlights
+- Tap any day to see scheduled payments
+- Only shows actual next payment dates (not recurring projections)
+
+### Android Widget
+
+- Shows total monthly spend
+- Displays next upcoming payment
+- Updates automatically when app data changes
+
+### Language Support
+
+- Turkish and English
+- Language preference persists across app restarts (AsyncStorage)

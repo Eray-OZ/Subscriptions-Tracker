@@ -12,6 +12,9 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { scheduleSubscriptionNotification, cancelSubscriptionNotification } from '../src/utils/notifications';
 import { updateWidgetData } from "../src/utils/widget";
 import { getTranslation, getCurrency, getCategoryTranslation, getFrequencyAbbr } from '../src/translations';
+import { BrandIcon } from '../src/components/BrandIcon';
+import { saveLanguage, loadLanguage } from '../src/utils/language';
+
 
 
 const gradients = [
@@ -106,10 +109,7 @@ const SummaryCard = ({ subscriptions, language }) => {
 
     }, [subscriptions, viewMode, language]);
 
-    // Update widget data when subscriptions change
-    useEffect(() => {
-        updateWidgetData(subscriptions, language);
-    }, [subscriptions, language]);
+
 
 
     const currentMonth = language === 'Turkish' 
@@ -247,8 +247,24 @@ export default function Index() {
     useFocusEffect(
         useCallback(() => {
             fetchSubscriptions();
+            // Load saved language preference
+            loadLanguage().then(savedLang => {
+                if (savedLang) setLanguage(savedLang);
+            });
         }, [])
     );
+
+    // Update widget data when FULL subscriptions list changes
+    useEffect(() => {
+        if (subscriptions.length > 0) {
+             updateWidgetData(subscriptions, language);
+        }
+    }, [subscriptions, language]);
+
+    // Save language when it changes
+    useEffect(() => {
+        saveLanguage(language);
+    }, [language]);
 
     const handleDelete = async (id) => {
         try {
@@ -753,6 +769,11 @@ export default function Index() {
                     <Text style={styles.headerTitle}>{t('appName')}</Text>
                 </View>
                 <View style={{ flexDirection: 'row', gap: 12 }}>
+                    <Link href={{ pathname: "/calendar", params: { language } }} asChild>
+                        <TouchableOpacity style={[styles.searchButton, { backgroundColor: colors.emerald500 }]}>
+                            <MaterialCommunityIcons name="calendar-month" size={22} color={colors.white} />
+                        </TouchableOpacity>
+                    </Link>
                     <TouchableOpacity style={[styles.searchButton, { backgroundColor: colors.indigo500 }]} onPress={fetchAllHistory}>
                         <MaterialCommunityIcons name="history" size={24} color={colors.white} />
                     </TouchableOpacity>

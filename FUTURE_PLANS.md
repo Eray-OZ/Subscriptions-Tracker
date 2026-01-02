@@ -136,6 +136,26 @@ Quick glance at subscription info without opening app.
 
 ---
 
+### 6. 📅 Calendar View
+
+**Priority: High**
+
+Visual overview of upcoming payments.
+
+**Features:**
+
+- Month view with payment dots
+- Click day to see payments
+- Total spend for selected day
+- Swipe between months
+
+**UI Changes:**
+
+- New tab or dedicated screen
+- `react-native-calendars` integration
+
+---
+
 ## Implementation Order
 
 1. **Phase 1** (Essential)

@@ -2,15 +2,18 @@
 
 ## Technology Stack
 
-| Layer         | Technology          | Version |
-| ------------- | ------------------- | ------- |
-| Framework     | Expo (React Native) | SDK ~54 |
-| Navigation    | Expo Router         | ~6.0    |
-| Database      | Expo SQLite         | ~16.0   |
-| Notifications | Expo Notifications  | ~0.32   |
-| Animations    | Reanimated          | ~4.1    |
-| Date Handling | date-fns            | ^4.1    |
-| Build         | EAS Build           | Managed |
+| Layer         | Technology                  | Version |
+| ------------- | --------------------------- | ------- |
+| Framework     | Expo (React Native)         | SDK ~54 |
+| Navigation    | Expo Router                 | ~6.0    |
+| Database      | Expo SQLite                 | ~16.0   |
+| Notifications | Expo Notifications          | ~0.32   |
+| Animations    | Reanimated                  | ~4.1    |
+| Date Handling | date-fns                    | ^4.1    |
+| Calendar      | react-native-calendars      | latest  |
+| Storage       | AsyncStorage                | latest  |
+| Widget        | react-native-android-widget | ^0.17   |
+| Build         | EAS Build                   | Managed |
 
 ## Dependencies
 
@@ -62,11 +65,18 @@ Subscriptions-Tracker/
 │   ├── _layout.jsx      # Root layout, notification setup
 │   ├── index.jsx        # Home screen (subscription list)
 │   ├── add.jsx          # Add subscription screen
+│   ├── calendar.jsx     # Calendar view screen
+├── src/
 │   ├── db/
 │   │   └── database.js  # SQLite database operations
 │   ├── utils/
-│   │   └── notifications.js  # Notification utilities
-│   └── styles/          # Component styles
+│   │   ├── notifications.js  # Notification utilities
+│   │   ├── widget.js         # Widget data sync
+│   │   └── language.js       # Language persistence
+│   ├── translations/    # i18n strings (TR/EN)
+│   ├── styles/          # Component styles
+│   └── components/      # Reusable components
+├── widget/              # Android widget components
 ├── assets/              # Images, icons
 ├── memory-bank/         # Project documentation
 ├── app.json             # Expo config
