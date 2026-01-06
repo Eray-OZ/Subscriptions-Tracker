@@ -77,6 +77,12 @@ When a subscription is past due:
 - Turkish and English
 - Language preference persists across app restarts (SecureStore)
 
+### UI/UX Improvements
+
+- **iOS Picker:** Replaced inline wheel with clean Modal Picker for Categories to prevent overlap.
+- **Date/Time Pickers:** Standardized on Modal display for iOS.
+- **Localization:** Turkish language support fully implemented across app and widgets.
+
 ### UI Polish
 
 - Empty state with indigo inbox icon when no subscriptions

@@ -20,6 +20,7 @@ export default function AddScreen() {
     const [nextPaymentDate, setNextPaymentDate] = useState(new Date());
     const [isTrial, setIsTrial] = useState(false);
     const [trialEndDate, setTrialEndDate] = useState(new Date());
+    const [showCategoryPicker, setShowCategoryPicker] = useState(false);
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [showTimePicker, setShowTimePicker] = useState(false);
     const language = params.language || 'Turkish';
@@ -288,23 +289,71 @@ export default function AddScreen() {
 
                 <View style={styles.labelContainer}>
                     <Text style={styles.labelText}>{t('category')}</Text>
-                    <View style={styles.picker}>
-                        <Picker
-                            selectedValue={selectedCategory}
-                            onValueChange={(itemValue) => setSelectedCategory(itemValue)}
-                            style={{ color: colors.white }}
-                            dropdownIconColor={colors.primary}
-                        >
-                            {categories.map((category) => (
-                                <Picker.Item
-                                    key={category.id}
-                                    label={getCategoryTranslation(language, category.name)}
-                                    value={category.id}
-                                    color={Platform.OS === 'ios' ? colors.white : colors.backgroundDark}
-                                />
-                            ))}
-                        </Picker>
-                    </View>
+                    {Platform.OS === 'ios' ? (
+                        <>
+                            <TouchableOpacity 
+                                style={[styles.input, { justifyContent: 'center' }]} 
+                                onPress={() => setShowCategoryPicker(true)}
+                            >
+                                <Text style={{ color: colors.white, fontSize: 16 }}>
+                                    {selectedCategory 
+                                        ? getCategoryTranslation(language, categories.find(c => c.id === selectedCategory)?.name) 
+                                        : t('selectCategory')}
+                                </Text>
+                                <MaterialCommunityIcons name="chevron-down" size={24} style={styles.pickerIcon} />
+                            </TouchableOpacity>
+
+                            {showCategoryPicker && (
+                                <Modal transparent animationType="slide">
+                                    <View style={{ flex: 1, justifyContent: 'flex-end', backgroundColor: 'rgba(0,0,0,0.5)' }}>
+                                        <View style={{ backgroundColor: colors.cardBackground || '#1e1e24', padding: 16, borderTopLeftRadius: 16, borderTopRightRadius: 16 }}>
+                                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 }}>
+                                                <TouchableOpacity onPress={() => setShowCategoryPicker(false)}>
+                                                    <Text style={{ color: colors.red500, fontSize: 16 }}>{t('cancel')}</Text>
+                                                </TouchableOpacity>
+                                                <TouchableOpacity onPress={() => setShowCategoryPicker(false)}>
+                                                    <Text style={{ color: colors.indigo400, fontSize: 16, fontWeight: 'bold' }}>{t('confirm')}</Text>
+                                                </TouchableOpacity>
+                                            </View>
+                                            <Picker
+                                                selectedValue={selectedCategory}
+                                                onValueChange={(itemValue) => setSelectedCategory(itemValue)}
+                                                style={{ color: colors.white }}
+                                                dropdownIconColor={colors.primary}
+                                            >
+                                                {categories.map((category) => (
+                                                    <Picker.Item
+                                                        key={category.id}
+                                                        label={getCategoryTranslation(language, category.name)}
+                                                        value={category.id}
+                                                        color={colors.white}
+                                                    />
+                                                ))}
+                                            </Picker>
+                                        </View>
+                                    </View>
+                                </Modal>
+                            )}
+                        </>
+                    ) : (
+                        <View style={styles.picker}>
+                            <Picker
+                                selectedValue={selectedCategory}
+                                onValueChange={(itemValue) => setSelectedCategory(itemValue)}
+                                style={{ color: colors.white }}
+                                dropdownIconColor={colors.primary}
+                            >
+                                {categories.map((category) => (
+                                    <Picker.Item
+                                        key={category.id}
+                                        label={getCategoryTranslation(language, category.name)}
+                                        value={category.id}
+                                        color={colors.backgroundDark}
+                                    />
+                                ))}
+                            </Picker>
+                        </View>
+                    )}
                 </View>
             </ScrollView>
 

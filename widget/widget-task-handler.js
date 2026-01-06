@@ -10,16 +10,14 @@ export async function widgetTaskHandler(props) {
     const data = props.renderWidgetRequest || props;
 
     // Extract values with safe defaults
-    const totalMonthly = data.totalMonthly ?? "0.00";
-    const nextPaymentName = data.nextPaymentName ?? null;
-    const nextPaymentDate = data.nextPaymentDate ?? null;
+    const upcomingPayments = data.upcomingPayments || [];
+    const translations = data.translations || {};
     const currencySymbol = data.currencySymbol ?? "₺";
 
     return (
       <SubscriptionWidget 
-        totalMonthly={totalMonthly}
-        nextPaymentName={nextPaymentName}
-        nextPaymentDate={nextPaymentDate}
+        upcomingPayments={upcomingPayments}
+        translations={translations}
         currencySymbol={currencySymbol}
       />
     );
