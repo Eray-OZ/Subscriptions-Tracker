@@ -65,12 +65,12 @@ When a subscription is past due:
 
 - **Status:** Completed ✅
 - **Features:**
-  - Displays up to 5 closest upcoming payments.
-  - Minimal dark theme design for premium look.
-  - Localized in English and Turkish.
-  - Optimized layouts for Small (3 items) and Medium (5 items) sizes.
-  - Shows name, days left (badge), and amount (Medium/Large only).
-  - Deep linking to app (opens main screen).(not available in Expo Go)
+  - **Small/Medium:** Displays up to 3/5 closest upcoming payments.
+  - **Large:** Monthly Calendar view + "THIS MONTH" payment list (up to 4 items).
+  - **Visuals:** Minimal dark theme, payment date markers (dots), and Days-Left badges.
+  - **Date Format:** "15 JAN" (Day Month) instead of relative days.
+  - **Localization:** English and Turkish support.
+  - **Deep Linking:** Tapping opens the app.
 
 ### Language Support
 
