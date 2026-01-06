@@ -18,16 +18,16 @@ import { saveLanguage, loadLanguage } from '../src/utils/language';
 
 
 
-// Solid colors (simulated with gradients)
+// Medium-dark, muted colors for cards
 const gradients = [
-    ['#3b82f6', '#2563eb'], // Blue (Classic)
-    ['#ef4444', '#dc2626'], // Red
-    ['#10b981', '#059669'], // Emerald
-    ['#f59e0b', '#d97706'], // Amber
-    ['#8b5cf6', '#7c3aed'], // Violet
-    ['#64748b', '#475569'], // Slate (Platinum)
-    ['#ec4899', '#db2777'], // Pink
-    ['#06b6d4', '#0891b2'], // Cyan
+    ['#2563eb', '#1d4ed8'], // Medium Blue
+    ['#dc2626', '#b91c1c'], // Medium Red
+    ['#059669', '#047857'], // Medium Emerald
+    ['#d97706', '#b45309'], // Medium Amber
+    ['#7c3aed', '#6d28d9'], // Medium Violet
+    ['#475569', '#334155'], // Medium Slate
+    ['#db2777', '#be123c'], // Medium Pink
+    ['#0891b2', '#0e7490'], // Medium Cyan
 ];
 
 const getGradientForId = (id) => {
@@ -150,7 +150,7 @@ const SummaryCard = ({ subscriptions, language }) => {
                 <View style={styles.summaryCardHeader}>
                     <View>
                         <View style={styles.summaryBadge}>
-                            <View style={styles.summaryBadgeDot} />
+                            <View style={[styles.summaryBadgeDot, { backgroundColor: 'white' }]} />
                             <Text style={styles.summaryBadgeText}>{currentMonth}</Text>
                         </View>
                         <View style={styles.summaryAmount}>
@@ -158,12 +158,6 @@ const SummaryCard = ({ subscriptions, language }) => {
                             <Text style={styles.summaryAmountDecimal}>.{stats.cents}</Text>
                         </View>
                         <Text style={styles.summaryLabel}>{t('totalSpend')} {stats.displayLabel}</Text>
-                    </View>
-                    
-                    <View style={styles.summaryTrend}>
-                        <View style={styles.summaryTrendIcon}>
-                            <MaterialCommunityIcons name="trending-up" size={20} color={colors.indigo400} />
-                        </View>
                     </View>
                 </View>
 
@@ -383,15 +377,22 @@ export default function Index() {
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 1 }}
                 >
-                    {/* Top Row: Icon + Amount */}
+                    {/* Top Row: Icon + Trial Badge + Amount */}
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                         <View style={{ 
-                             backgroundColor: 'rgba(255,255,255,0.25)', 
-                             borderRadius: 12, 
-                             padding: 8,
-                             backdropFilter: 'blur(10px)' 
-                         }}>
-                            <BrandIcon name={item.name} category={item.category_name} size={28} color="white" />
+                         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+                             <View style={{ 
+                                 backgroundColor: 'rgba(255,255,255,0.25)', 
+                                 borderRadius: 12, 
+                                 padding: 8,
+                                 backdropFilter: 'blur(10px)' 
+                             }}>
+                                <BrandIcon name={item.name} category={item.category_name} size={28} color="white" />
+                             </View>
+                             {item.isTrial ? (
+                                <View style={{ backgroundColor: 'rgba(255,255,255,0.9)', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6 }}>
+                                    <Text style={{ fontSize: 10, fontWeight: '800', color: '#7c3aed' }}>{t('trial').toUpperCase()}</Text>
+                                </View>
+                             ) : null}
                          </View>
                          
                          {!isEditingThis ? (
@@ -434,7 +435,7 @@ export default function Index() {
                                     {isPast ? 'OVERDUE' : 'EXP'}
                                 </Text>
                                 <Text style={{ fontSize: 12, fontWeight: '700', color: 'white' }}>
-                                    {format(dateToCheck, 'MM/yy')}
+                                    {format(dateToCheck, 'dd/MM')}
                                 </Text>
                             </View>
 
@@ -798,7 +799,7 @@ export default function Index() {
                             <MaterialCommunityIcons name="calendar-month" size={22} color={colors.white} />
                         </TouchableOpacity>
                     </Link>
-                    <TouchableOpacity style={[styles.searchButton, { backgroundColor: colors.indigo500 }]} onPress={fetchAllHistory}>
+                    <TouchableOpacity style={styles.searchButton} onPress={fetchAllHistory}>
                         <MaterialCommunityIcons name="history" size={24} color={colors.white} />
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.searchButton} onPress={() => setFilterModalVisible(true)}>

@@ -8,6 +8,9 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { scheduleSubscriptionNotification } from "../src/utils/notifications";
 import { getTranslation, getCurrency, getCategoryTranslation } from "../src/translations";
+import { LinearGradient } from 'expo-linear-gradient';
+import { BrandIcon } from "../src/components/BrandIcon";
+import { format } from 'date-fns';
 
 export default function AddScreen() {
     const params = useLocalSearchParams();
@@ -124,6 +127,64 @@ export default function AddScreen() {
             </View>
 
             <ScrollView style={styles.main} showsVerticalScrollIndicator={false}>
+                {/* Live Card Preview */}
+                <LinearGradient
+                    colors={isTrial ? ['#8b5cf6', '#7c3aed'] : ['#3b82f6', '#2563eb']}
+                    style={{
+                        borderRadius: 24,
+                        padding: 20,
+                        marginBottom: 24,
+                        minHeight: 180,
+                        justifyContent: 'space-between'
+                    }}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                >
+                    {/* Top Row: Icon + Trial Badge + Amount */}
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+                            <View style={{ 
+                                backgroundColor: 'rgba(255,255,255,0.25)', 
+                                borderRadius: 12, 
+                                padding: 8
+                            }}>
+                                <BrandIcon name={name || 'subscription'} category={categories.find(c => c.id === selectedCategory)?.name || ''} size={28} color="white" />
+                            </View>
+                            {isTrial && (
+                                <View style={{ backgroundColor: 'rgba(255,255,255,0.9)', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6 }}>
+                                    <Text style={{ fontSize: 10, fontWeight: '800', color: '#7c3aed' }}>{t('trial').toUpperCase()}</Text>
+                                </View>
+                            )}
+                        </View>
+                        <Text style={{ fontSize: 24, fontWeight: '800', color: 'white', letterSpacing: -1 }}>
+                            {getCurrency(language)}{amount || '0.00'}
+                        </Text>
+                    </View>
+
+                    {/* Middle: Category + Name */}
+                    <View style={{ flex: 1, justifyContent: 'center', paddingTop: 16 }}>
+                        <Text style={{ color: 'rgba(255,255,255,0.7)', fontSize: 10, fontWeight: '700', letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: 4 }}>
+                            {getCategoryTranslation(language, categories.find(c => c.id === selectedCategory)?.name) || t('category')}
+                        </Text>
+                        <Text style={{ fontSize: 22, fontWeight: '700', color: 'white', letterSpacing: 0.5 }}>
+                            {name || t('subscriptionName')}
+                        </Text>
+                    </View>
+
+                    {/* Bottom Row: Card Name + Date */}
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+                        <Text style={{ color: 'rgba(255,255,255,0.6)', fontSize: 14, letterSpacing: 1, fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace' }}>
+                            {cardName || '•••• 0001'}
+                        </Text>
+                        <View style={{ alignItems: 'flex-end' }}>
+                            <Text style={{ color: 'rgba(255,255,255,0.8)', fontSize: 8, fontWeight: '600' }}>EXP</Text>
+                            <Text style={{ fontSize: 12, fontWeight: '700', color: 'white' }}>
+                                {format(isTrial ? trialEndDate : nextPaymentDate, 'dd/MM')}
+                            </Text>
+                        </View>
+                    </View>
+                </LinearGradient>
+
                 <View style={styles.labelContainer}>
                     <Text style={styles.labelText}>{t('subscriptionName')}</Text>
                     <TextInput

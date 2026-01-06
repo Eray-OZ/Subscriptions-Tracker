@@ -59,7 +59,7 @@ export const setupDatabase = async () => {
 export const getSubscriptions = async () => {
   if (!db) throw new Error("Veritabanı henüz kurulmadı!");
   const allSubs = await db.getAllAsync(`
-    SELECT s.id, s.name, s.amount, s.nextPaymentDate as next_payment_date, c.name as category_name, s.frequency, s.isTrial, s.trialEndDate, s.reminderDaysBefore, s.reminderHour, s.reminderMinute, s.cardName
+    SELECT s.id, s.name, s.amount, s.nextPaymentDate as next_payment_date, s.categoryId, c.name as category_name, s.frequency, s.isTrial, s.trialEndDate, s.reminderDaysBefore, s.reminderHour, s.reminderMinute, s.cardName
     FROM Subscriptions s
     JOIN Categories c ON s.categoryId = c.id
     ORDER BY s.id DESC

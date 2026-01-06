@@ -19,9 +19,21 @@ export default function EditScreen() {
     const [name, setName] = useState(params.name || '');
     const [amount, setAmount] = useState(params.amount?.toString() || '');
     const [frequency, setFrequency] = useState(params.frequency || 'Monthly');
-    const [nextPaymentDate, setNextPaymentDate] = useState(params.nextPaymentDate ? new Date(params.nextPaymentDate) : new Date());
+    const [nextPaymentDate, setNextPaymentDate] = useState(() => {
+        if (params.nextPaymentDate && params.nextPaymentDate !== 'undefined' && params.nextPaymentDate !== 'null') {
+            const parsed = new Date(params.nextPaymentDate);
+            return isNaN(parsed.getTime()) ? new Date() : parsed;
+        }
+        return new Date();
+    });
     const [isTrial, setIsTrial] = useState(params.isTrial === '1' || params.isTrial === 'true');
-    const [trialEndDate, setTrialEndDate] = useState(params.trialEndDate ? new Date(params.trialEndDate) : new Date());
+    const [trialEndDate, setTrialEndDate] = useState(() => {
+        if (params.trialEndDate && params.trialEndDate !== 'undefined' && params.trialEndDate !== 'null') {
+            const parsed = new Date(params.trialEndDate);
+            return isNaN(parsed.getTime()) ? new Date() : parsed;
+        }
+        return new Date();
+    });
     const [showCategoryPicker, setShowCategoryPicker] = useState(false);
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [showTimePicker, setShowTimePicker] = useState(false);

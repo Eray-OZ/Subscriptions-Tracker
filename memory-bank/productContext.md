@@ -103,3 +103,18 @@ When a subscription is past due:
 - Dedicated Edit screen (same UI as Add screen)
 - Edit all fields: Name, Amount, Category, Card Name, Dates, Reminders
 - Pre-filled with existing subscription data
+
+### Credit Card Style Add Screen
+
+- Live card preview at top that updates as user types
+- Shows dynamic icon, amount, category, name, card name, date
+- Purple card + TRIAL badge when Free Trial is enabled
+- Premium Apple Wallet aesthetic
+
+### UI Design Harmony
+
+- Date format: DD/MM (day/month) instead of MM/YY
+- Header icons: White on transparent backgrounds (Calendar, History, Settings)
+- Card colors: Medium-dark muted gradients for visual consistency
+- Summary card: White date badge dot, no trending arrow
+- Trial badge: Shows "DENEME" on both Add and Dashboard cards
