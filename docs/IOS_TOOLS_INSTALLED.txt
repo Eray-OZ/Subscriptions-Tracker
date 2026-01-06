@@ -1,0 +1,38 @@
+# iOS Development Tools Downloaded (January 2026)
+
+## Total Size: ~32GB
+
+### 1. Xcode (~12GB)
+- Location: /Applications/Xcode.app
+- Purpose: Apple's IDE for iOS/macOS development
+- Includes: Code editor, Interface Builder, debugging tools
+
+### 2. iOS Simulator Runtime (~7GB)
+- Location: ~/Library/Developer/CoreSimulator/
+- Purpose: Virtual iPhone/iPad for testing
+- Current: iPhone 17 Pro simulator
+
+### 3. iOS SDK & Toolchains (~7GB)
+- Location: Inside Xcode.app
+- Includes:
+  - Swift compiler
+  - Objective-C compiler
+  - iOS frameworks (UIKit, SwiftUI, WidgetKit, etc.)
+  - Code signing tools
+
+### 4. CocoaPods (~100MB)
+- Location: /opt/homebrew/Cellar/cocoapods/
+- Purpose: iOS dependency manager (like npm for iOS)
+- Installed via: Homebrew
+
+### 5. Ruby 4.0 (~60MB)
+- Location: /opt/homebrew/Cellar/ruby/
+- Purpose: Required for CocoaPods
+- Installed via: Homebrew (as CocoaPods dependency)
+
+---
+
+## Commands:
+- Open Xcode: `open /Applications/Xcode.app`
+- Open iOS Simulator: `open -a Simulator`
+- Run Expo on iOS: `npx expo start` then press `i`

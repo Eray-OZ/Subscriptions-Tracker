@@ -1,24 +1,25 @@
 # Active Context: SubTracker
 
-## Current Focus
+## Active Context
 
-Preparing for APK build with new app icon.
+**Current Focus:** Finalizing iOS Widget Implementation
+**Recent Changes:**
 
-## Recent Changes (2026-01-01)
-
-### Notification System Overhaul
-
-- Created centralized `utils/notifications.js`
-- Added `expo-notifications` plugin to `app.json`
-- Moved notification handler to `_layout.jsx`
-- Added app launch notification rescheduling
-
-### Build Configuration
-
-- Added `eas.json` with APK preview profile
-- Created `.easignore` to speed up builds
-- Updated app icon to Gemini-generated image
-- Added Android package: `com.erayoz.subtracker`
+- **iOS Widget:**
+  - Implemented sleek, minimal dark theme.
+  - Added Turkish language support involving JS-to-Native bridge updates.
+  - Optimized layout for Small/Medium widgets (hiding amount on small, using fixed-width alignment).
+  - Fixed initial sync reliability by forcing updates on app launch.
+  - Resolved `xcodeproj` compatibility issues for CocoaPods.
+- **Build Configuration:**
+  - Added `eas.json` with APK preview profile
+  - Created `.easignore` to speed up builds
+  - Updated app icon to Gemini-generated image
+  - Added Android package: `com.erayoz.subtracker`
+    **Next Steps:**
+- Complete final manual verification.
+- Cleanup unused code/assets if any.
+- Release preparation.
 
 ## Next Steps
 

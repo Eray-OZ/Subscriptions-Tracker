@@ -258,15 +258,14 @@ export default function Index() {
         }, [])
     );
 
-    // Update widget data when FULL subscriptions list changes
+    // Update widget data when subscriptions list or language changes
     useEffect(() => {
-        if (subscriptions.length > 0) {
-             // Android widget
-             updateWidgetData(subscriptions, language);
-             // iOS widget
-             const iosData = calculateWidgetData(subscriptions, getCurrency(language));
-             updateiOSWidget(iosData);
-        }
+        // Always upate widget to ensure language/empty state is synced
+        // Android widget
+        updateWidgetData(subscriptions, language);
+        // iOS widget
+        const iosData = calculateWidgetData(subscriptions, language);
+        updateiOSWidget(iosData);
     }, [subscriptions, language]);
 
     // Save language when it changes

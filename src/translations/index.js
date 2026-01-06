@@ -81,6 +81,12 @@ export const translations = {
     // Empty State
     noSubscriptions: 'No subscriptions yet',
     addFirstSubscription: 'Tap the + button to track your first subscription',
+    
+    // Widget
+    widgetUpcoming: 'UPCOMING',
+    widgetNoPayments: 'No upcoming payments',
+    widgetToday: 'TODAY',
+    widgetDayChar: 'd',
   },
   tr: {
     // Dashboard
@@ -162,6 +168,12 @@ export const translations = {
     // Empty State
     noSubscriptions: 'Henüz abonelik yok',
     addFirstSubscription: 'İlk aboneliğinizi eklemek için + butonuna dokunun',
+    
+    // Widget
+    widgetUpcoming: 'YAKLAŞAN',
+    widgetNoPayments: 'Yaklaşan ödeme yok',
+    widgetToday: 'BUGÜN',
+    widgetDayChar: 'g',
   },
 };
 

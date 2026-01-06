@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { View, Text, TextInput, TouchableOpacity, Platform, KeyboardAvoidingView, ScrollView, Switch } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, Platform, KeyboardAvoidingView, ScrollView, Switch, Modal } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import { router, useLocalSearchParams } from "expo-router";
 import { addSubscription, getCategories } from "../src/db/database.js";
@@ -218,24 +218,69 @@ export default function AddScreen() {
                     </TouchableOpacity>
                 </View>
                 
-                {showDatePicker && (
+                {showDatePicker && Platform.OS === 'ios' ? (
+                    <Modal transparent animationType="slide">
+                        <View style={{ flex: 1, justifyContent: 'flex-end', backgroundColor: 'rgba(0,0,0,0.5)' }}>
+                            <View style={{ backgroundColor: colors.cardBackground, padding: 16, borderTopLeftRadius: 16, borderTopRightRadius: 16 }}>
+                                <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 }}>
+                                    <TouchableOpacity onPress={() => setShowDatePicker(false)}>
+                                        <Text style={{ color: colors.red500, fontSize: 16 }}>Cancel</Text>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity onPress={() => setShowDatePicker(false)}>
+                                        <Text style={{ color: colors.indigo400, fontSize: 16, fontWeight: 'bold' }}>Done</Text>
+                                    </TouchableOpacity>
+                                </View>
+                                <DateTimePicker
+                                    testID="dateTimePicker"
+                                    value={isTrial ? trialEndDate : nextPaymentDate}
+                                    mode={'date'}
+                                    display="spinner"
+                                    onChange={onDateChange}
+                                    minimumDate={new Date()}
+                                    textColor={colors.white}
+                                />
+                            </View>
+                        </View>
+                    </Modal>
+                ) : showDatePicker && (
                     <DateTimePicker
                         testID="dateTimePicker"
                         value={isTrial ? trialEndDate : nextPaymentDate}
                         mode={'date'}
-                        is24Hour={true}
                         display="default"
                         onChange={onDateChange}
                         minimumDate={new Date()}
                     />
                 )}
 
-                {showTimePicker && (
+                {showTimePicker && Platform.OS === 'ios' ? (
+                    <Modal transparent animationType="slide">
+                        <View style={{ flex: 1, justifyContent: 'flex-end', backgroundColor: 'rgba(0,0,0,0.5)' }}>
+                            <View style={{ backgroundColor: colors.cardBackground, padding: 16, borderTopLeftRadius: 16, borderTopRightRadius: 16 }}>
+                                <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 }}>
+                                    <TouchableOpacity onPress={() => setShowTimePicker(false)}>
+                                        <Text style={{ color: colors.red500, fontSize: 16 }}>Cancel</Text>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity onPress={() => setShowTimePicker(false)}>
+                                        <Text style={{ color: colors.indigo400, fontSize: 16, fontWeight: 'bold' }}>Done</Text>
+                                    </TouchableOpacity>
+                                </View>
+                                <DateTimePicker
+                                    testID="timePicker"
+                                    value={reminderTime}
+                                    mode={'time'}
+                                    display="spinner"
+                                    onChange={onTimeChange}
+                                    textColor={colors.white}
+                                />
+                            </View>
+                        </View>
+                    </Modal>
+                ) : showTimePicker && (
                     <DateTimePicker
                         testID="timePicker"
                         value={reminderTime}
                         mode={'time'}
-                        is24Hour={true}
                         display="default"
                         onChange={onTimeChange}
                     />

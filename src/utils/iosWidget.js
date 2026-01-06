@@ -1,28 +1,29 @@
 import { NativeModules, Platform } from "react-native";
+import { getCurrency, getTranslation } from "../translations";
 
 /**
  * Updates the iOS widget with subscription data
  * Uses App Groups to share data between main app and widget extension
  * 
  * @param {Object} data - Widget data object
- * @param {number} data.totalMonthly - Total monthly subscription spend
- * @param {string} data.currency - Currency symbol ($ or ₺)
- * @param {Object|null} data.nextPayment - Next upcoming payment info
- * @param {string} data.nextPayment.name - Subscription name
- * @param {number} data.nextPayment.amount - Payment amount
- * @param {number} data.nextPayment.daysLeft - Days until payment
  */
 export const updateiOSWidget = async (data) => {
   // Only run on iOS
-  if (Platform.OS !== "ios") return;
+  if (Platform.OS !== "ios") {
+    // console.log("iOS widget: Not iOS, skipping");
+    return;
+  }
+
+  // console.log("iOS widget: Attempting to update with data:", JSON.stringify(data));
 
   try {
     // Check if the native module exists (only available in native builds)
     if (NativeModules.WidgetModule) {
+      // console.log("iOS widget: WidgetModule found, calling updateWidgetData");
       await NativeModules.WidgetModule.updateWidgetData(JSON.stringify(data));
-      console.log("iOS widget updated successfully");
+      // console.log("iOS widget updated successfully");
     } else {
-      // Native module not available (running in Expo Go or module not linked)
+      // Native module not available
       console.log("iOS WidgetModule not available - requires native build");
     }
   } catch (error) {
@@ -34,37 +35,29 @@ export const updateiOSWidget = async (data) => {
  * Calculates widget data from subscriptions array
  * 
  * @param {Array} subscriptions - Array of subscription objects
- * @param {string} currency - Currency symbol
+ * @param {string} language - Current app language
  * @returns {Object} Widget data object
  */
-export const calculateWidgetData = (subscriptions, currency) => {
+export const calculateWidgetData = (subscriptions, language) => {
+  const currency = getCurrency(language);
+  
+  // Get translations for widget
+  const translations = {
+    upcoming: getTranslation(language, 'widgetUpcoming'),
+    noPayments: getTranslation(language, 'widgetNoPayments'),
+    today: getTranslation(language, 'widgetToday'),
+    dayChar: getTranslation(language, 'widgetDayChar'),
+  };
+
   if (!subscriptions || subscriptions.length === 0) {
     return {
-      totalMonthly: 0,
-      currency: currency,
-      nextPayment: null,
+      currency,
+      translations,
+      upcomingPayments: [],
     };
   }
 
-  // Calculate total monthly spend (normalize to monthly)
-  const normalizedSubs = subscriptions
-    .filter((sub) => !sub.isTrial) // Exclude trials
-    .map((sub) => {
-      let monthlyAmount = sub.amount;
-      if (sub.frequency === "Weekly") {
-        monthlyAmount = sub.amount * 4;
-      } else if (sub.frequency === "Yearly") {
-        monthlyAmount = sub.amount / 12;
-      }
-      return { ...sub, monthlyAmount };
-    });
-
-  const totalMonthly = normalizedSubs.reduce(
-    (sum, sub) => sum + sub.monthlyAmount,
-    0
-  );
-
-  // Find next upcoming payment
+  // Calculate upcoming payments (closest 5)
   const today = new Date();
   const upcomingSubs = subscriptions
     .map((sub) => {
@@ -77,19 +70,16 @@ export const calculateWidgetData = (subscriptions, currency) => {
       return { ...sub, paymentDate, daysLeft };
     })
     .filter((sub) => sub.daysLeft >= 0)
-    .sort((a, b) => a.daysLeft - b.daysLeft);
-
-  const nextSub = upcomingSubs[0];
+    .sort((a, b) => a.daysLeft - b.daysLeft)
+    .slice(0, 5); // Get closest 5
 
   return {
-    totalMonthly: Math.round(totalMonthly * 100) / 100,
-    currency: currency,
-    nextPayment: nextSub
-      ? {
-          name: nextSub.name,
-          amount: nextSub.amount,
-          daysLeft: nextSub.daysLeft,
-        }
-      : null,
+    currency,
+    translations, // Pass translations to native side
+    upcomingPayments: upcomingSubs.map(sub => ({
+      name: sub.name,
+      amount: sub.amount,
+      daysLeft: sub.daysLeft,
+    })),
   };
 };

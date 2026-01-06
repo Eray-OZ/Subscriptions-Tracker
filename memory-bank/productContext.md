@@ -61,12 +61,16 @@ When a subscription is past due:
 - Displays next upcoming payment
 - Updates automatically when app data changes
 
-### iOS Widget (In Progress)
+### iOS Widget
 
-- Native SwiftUI widget using WidgetKit
-- Shares data via App Groups
-- Same functionality as Android widget
-- Requires native build (not available in Expo Go)
+- **Status:** Completed ✅
+- **Features:**
+  - Displays up to 5 closest upcoming payments.
+  - Minimal dark theme design for premium look.
+  - Localized in English and Turkish.
+  - Optimized layouts for Small (3 items) and Medium (5 items) sizes.
+  - Shows name, days left (badge), and amount (Medium/Large only).
+  - Deep linking to app (opens main screen).(not available in Expo Go)
 
 ### Language Support
 
