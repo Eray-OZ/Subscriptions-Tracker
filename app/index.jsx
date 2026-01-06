@@ -11,6 +11,7 @@ import { tr } from 'date-fns/locale';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { scheduleSubscriptionNotification, cancelSubscriptionNotification } from '../src/utils/notifications';
 import { updateWidgetData } from "../src/utils/widget";
+import { updateiOSWidget, calculateWidgetData } from "../src/utils/iosWidget";
 import { getTranslation, getCurrency, getCategoryTranslation, getFrequencyAbbr } from '../src/translations';
 import { BrandIcon } from '../src/components/BrandIcon';
 import { saveLanguage, loadLanguage } from '../src/utils/language';
@@ -260,7 +261,11 @@ export default function Index() {
     // Update widget data when FULL subscriptions list changes
     useEffect(() => {
         if (subscriptions.length > 0) {
+             // Android widget
              updateWidgetData(subscriptions, language);
+             // iOS widget
+             const iosData = calculateWidgetData(subscriptions, getCurrency(language));
+             updateiOSWidget(iosData);
         }
     }, [subscriptions, language]);
 

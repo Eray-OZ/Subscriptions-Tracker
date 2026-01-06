@@ -224,7 +224,7 @@ export default function AddScreen() {
                         value={isTrial ? trialEndDate : nextPaymentDate}
                         mode={'date'}
                         is24Hour={true}
-                        display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                        display="default"
                         onChange={onDateChange}
                         minimumDate={new Date()}
                     />
@@ -236,7 +236,7 @@ export default function AddScreen() {
                         value={reminderTime}
                         mode={'time'}
                         is24Hour={true}
-                        display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                        display="default"
                         onChange={onTimeChange}
                     />
                 )}

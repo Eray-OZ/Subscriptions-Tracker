@@ -2,19 +2,20 @@
   "expo": {
     "name": "SubTracker",
     "slug": "SubTracker",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "orientation": "portrait",
     "icon": "./assets/app-icon.png",
     "scheme": "subtracker",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
+      "bundleIdentifier": "com.erayoz.subtracker",
       "supportsTablet": true
     },
     "android": {
       "package": "com.erayoz.subtracker",
       "adaptiveIcon": {
-        "backgroundColor": "#0D0C1D",
+        "backgroundColor": "#1A1A3A",
         "foregroundImage": "./assets/app-icon.png"
       },
       "edgeToEdgeEnabled": true,
