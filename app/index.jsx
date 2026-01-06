@@ -18,13 +18,16 @@ import { saveLanguage, loadLanguage } from '../src/utils/language';
 
 
 
+// Solid colors (simulated with gradients)
 const gradients = [
-    ['#a855f7', '#6366f1'],
-    ['#ec4899', '#ef4444'],
-    ['#22d3ee', '#0ea5e9'],
-    ['#f59e0b', '#f97316'],
-    ['#10b981', '#14b8a6'],
-    ['#6366f1', '#8b5cf6'],
+    ['#3b82f6', '#2563eb'], // Blue (Classic)
+    ['#ef4444', '#dc2626'], // Red
+    ['#10b981', '#059669'], // Emerald
+    ['#f59e0b', '#d97706'], // Amber
+    ['#8b5cf6', '#7c3aed'], // Violet
+    ['#64748b', '#475569'], // Slate (Platinum)
+    ['#ec4899', '#db2777'], // Pink
+    ['#06b6d4', '#0891b2'], // Cyan
 ];
 
 const getGradientForId = (id) => {
@@ -364,119 +367,107 @@ export default function Index() {
         const dateToCheck = item.isTrial && item.trialEndDate ? new Date(item.trialEndDate) : new Date(item.next_payment_date);
         const remainingDays = differenceInCalendarDays(dateToCheck, today);
         const isPast = isBefore(dateToCheck, today);
-        const statusStyle = getStatusStyle(remainingDays, isPast);
         const isEditingThis = isEditing && editingId === item.id;
-
+        
+        // Use gradient for the whole card
         return (
             <TouchableOpacity 
                 style={styles.subscriptionItem}
-                activeOpacity={0.7}
+                activeOpacity={0.9}
                 onLongPress={() => handleLongPress(item)}
-                delayLongPress={500}
+                delayLongPress={200}
+                onPress={() => openModal(item)} // Single tap to confirm/details
             >
-                {/* Status indicator line at bottom */}
-                <View 
-                    style={[
-                        styles.subscriptionItemIndicator, 
-                        { 
-                            backgroundColor: item.isTrial ? colors.indigo500 : statusStyle.color,
-                            width: isPast ? '90%' : `${Math.max(10, Math.min(90, (30 - remainingDays) / 30 * 100))}%`,
-                            opacity: 0.5,
-                        }
-                    ]} 
-                />
-                
-                <View style={styles.itemRow}>
-                    <LinearGradient
-                        colors={getGradientForId(item.id)}
-                        style={styles.subscriptionIconContainer}
-                    >
-                         <BrandIcon name={item.name} category={item.category_name} size={28} />
-                    </LinearGradient>
-                    
-                    <View style={styles.subscriptionInfo}>
-                        <View style={styles.subscriptionHeader}>
-                            <Text style={styles.subscriptionName}>{item.name}</Text>
-                            {!!item.isTrial && (
-                                <View style={{ backgroundColor: colors.indigo500, paddingHorizontal: 8, paddingVertical: 2, borderRadius: 12, marginLeft: 8 }}>
-                                    <Text style={{ color: 'white', fontSize: 10, fontWeight: 'bold' }}>{t('trial')}</Text>
-                                </View>
-                            )}
-                            <View style={{ flex: 1 }} />
-                            {!isEditingThis ? (
-                                <Text style={styles.subscriptionAmount}>
-                                    {getCurrency(language)}{item.amount.toFixed(2)}
-                                    <Text style={styles.subscriptionFrequency}>
-                                        /{getFrequencyAbbr(language, item.frequency || 'Monthly')}
-                                    </Text>
-                                </Text>
-                            ) : (
-                                <TextInput
-                                    style={styles.subscriptionAmountInput}
-                                    placeholder="$0.00"
-                                    placeholderTextColor={colors.slate500}
-                                    value={newPrice}
-                                    onChangeText={setNewPrice}
-                                    keyboardType="numeric"
-                                    autoFocus
-                                />
-                            )}
-                        </View>
-                        
-                        <Text style={styles.subscriptionMeta}>
-                            {getCategoryTranslation(language, item.category_name)} • {format(dateToCheck, 'd MMM', language === 'Turkish' ? { locale: tr } : {})}
+                <LinearGradient
+                    colors={getGradientForId(item.id)}
+                    style={styles.subscriptionItemGradient}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                >
+                    {/* Top Row: Icon + Amount */}
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                         <View style={{ 
+                             backgroundColor: 'rgba(255,255,255,0.25)', 
+                             borderRadius: 12, 
+                             padding: 8,
+                             backdropFilter: 'blur(10px)' 
+                         }}>
+                            <BrandIcon name={item.name} category={item.category_name} size={28} color="white" />
+                         </View>
+                         
+                         {!isEditingThis ? (
+                             <Text style={{ fontSize: 24, fontWeight: '800', color: 'white', letterSpacing: -1 }}>
+                                {getCurrency(language)}{item.amount.toFixed(2)}
+                             </Text>
+                         ) : (
+                            <TextInput
+                                style={styles.subscriptionAmountInput}
+                                value={newPrice}
+                                onChangeText={setNewPrice}
+                                keyboardType="numeric"
+                                autoFocus
+                            />
+                         )}
+                    </View>
+
+                    {/* Middle: Name and Category (Moved here) */}
+                    <View style={{ flex: 1, justifyContent: 'center', paddingTop: 24 }}>
+                         <Text style={{ color: 'rgba(255,255,255,0.7)', fontSize: 10, fontWeight: '700', letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: 4 }}>
+                            {getCategoryTranslation(language, item.category_name)}
                         </Text>
-                        
-                        <View style={styles.statusBadge}>
-                            <View style={[styles.statusDot, statusStyle.dot]} />
-                            <Text style={[styles.statusText, statusStyle.text]}>
-                                {item.isTrial 
-                                    ? (isPast ? t('trialEnds') : `${remainingDays} ${t('daysLeft')}`)
-                                    : (isPast ? t('overdue') : `${remainingDays} ${t('daysLeft')}`)
-                                }
-                            </Text>
+                        <Text style={{ fontSize: 22, fontWeight: '700', color: 'white', letterSpacing: 0.5, textShadowColor: 'rgba(0,0,0,0.2)', textShadowRadius: 4 }}>
+                            {item.name}
+                        </Text>
+                    </View>
+
+                    {/* Bottom Row: ID + Date */}
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+                         {/* Account ID / Decoration */}
+                        <Text style={{ color: 'rgba(255,255,255,0.6)', fontSize: 14, letterSpacing: 3, fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace' }}>
+                            •••• {item.id ? item.id.toString().padStart(4, '0').slice(-4) : '0000'}
+                        </Text>
+
+                        <View style={{ alignItems: 'flex-end' }}>
+                            <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: 4 }}>
+                                <Text style={{ color: 'rgba(255,255,255,0.8)', fontSize: 8, fontWeight: '600' }}>
+                                    {isPast ? 'OVERDUE' : 'EXP'}
+                                </Text>
+                                <Text style={{ fontSize: 12, fontWeight: '700', color: 'white' }}>
+                                    {format(dateToCheck, 'MM/yy')}
+                                </Text>
+                            </View>
+
+                            {/* Days Left Badge */}
+                            <View style={{ 
+                                backgroundColor: isPast ? 'rgba(239, 68, 68, 0.9)' : 'rgba(255,255,255,0.2)', 
+                                paddingHorizontal: 8, 
+                                paddingVertical: 2, 
+                                borderRadius: 8, 
+                                marginTop: 4 
+                            }}>
+                                <Text style={{ fontSize: 10, fontWeight: 'bold', color: 'white' }}>
+                                    {remainingDays} {t('daysLeft').toUpperCase()}
+                                </Text>
+                            </View>
                         </View>
                     </View>
-                </View>
-                
-                <View style={styles.itemFooter}>
-                    {isPast ? (
-                        <TouchableOpacity style={styles.confirmPaymentButton} onPress={() => openModal(item)}>
-                            <MaterialCommunityIcons name="check" size={14} color={'#fbbf24'} />
-                            <Text style={styles.confirmPaymentButtonText}>{t('confirmPayment')}</Text>
-                        </TouchableOpacity>
-                    ) : (
-                        <View />
-                    )}
-                    
-                    <View style={styles.actionButtons}>
-                        {!isEditingThis ? (
-                            <TouchableOpacity 
-                                style={styles.actionButton} 
-                                onPress={() => { 
-                                    setIsEditing(true);
-                                    setEditingId(item.id);
-                                    setNewPrice(item.amount.toString());
-                                }}
-                            >
-                                <MaterialCommunityIcons name="pencil" size={14} color={colors.slate300} />
-                            </TouchableOpacity>
-                        ) : (
-                            <TouchableOpacity 
-                                style={[styles.actionButton, { backgroundColor: 'rgba(99, 102, 241, 0.2)' }]} 
-                                onPress={() => handlePrice(item.id)}
-                            >
-                                <MaterialCommunityIcons name="check" size={14} color={colors.indigo400} />
-                            </TouchableOpacity>
-                        )}
-                        <TouchableOpacity 
-                            style={styles.actionButton} 
-                            onPress={() => handleDelete(item.id)}
-                        >
-                            <MaterialCommunityIcons name="delete" size={14} color={colors.red400} />
-                        </TouchableOpacity>
+
+                    {/* Progress Bar (Payment Proximity) */}
+                    <View style={{ 
+                        height: 4, 
+                        backgroundColor: 'rgba(255,255,255,0.2)', 
+                        borderRadius: 2, 
+                        marginTop: 16, 
+                        overflow: 'hidden' 
+                    }}>
+                        <View style={{ 
+                            height: '100%', 
+                            width: `${Math.max(5, Math.min(100, ((30 - remainingDays) / 30) * 100))}%`, 
+                            backgroundColor: item.isTrial ? '#818cf8' : (remainingDays <= 3 ? '#ef4444' : (remainingDays <= 7 ? '#f59e0b' : '#34d399')),
+                            borderRadius: 2
+                        }} />
                     </View>
-                </View>
+                </LinearGradient>
             </TouchableOpacity>
         );
     };

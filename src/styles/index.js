@@ -230,36 +230,31 @@ export const styles = StyleSheet.create({
   },
 
   // Subscription Item Styles
+  // Subscription Item Styles
   subscriptionItem: {
-    backgroundColor: colors.surfaceLighter,
-    borderRadius: 28,
+    marginVertical: 10,
+    borderRadius: 24,
+    height: 220,
+  },
+  subscriptionItemGradient: {
+    flex: 1,
+    borderRadius: 24,
     padding: 20,
-    marginBottom: 20,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.05)',
-    overflow: 'hidden',
-    ...shadows.subtle,
+    justifyContent: 'space-between',
   },
   subscriptionItemIndicator: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    height: 2,
-    borderRadius: 1,
+    display: 'none', // Removed in new design
   },
   itemRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 16,
+    // Legacy support, might remove later
   },
   subscriptionIconContainer: {
-    width: 56,
-    height: 56,
-    borderRadius: 16,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)', // translucent
     justifyContent: 'center',
     alignItems: 'center',
-    overflow: 'hidden',
-    ...shadows.subtle,
   },
   subscriptionInfo: {
     flex: 1,
