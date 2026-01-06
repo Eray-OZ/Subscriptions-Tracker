@@ -1,6 +1,6 @@
 import { useState, useCallback, useMemo, useEffect } from "react";
 import { FlatList, Text, View, TouchableOpacity, Modal, TextInput, Platform, ScrollView } from "react-native";
-import { Link } from "expo-router";
+import { Link, router } from "expo-router";
 import { useFocusEffect } from "@react-navigation/native";
 import { getSubscriptions, getCategories, deleteSubscription, addPaymentToHistory, updateSubscription, updateAmount, getPaymentHistoryBySubscription, getPaymentHistory } from "../src/db/database";
 import { styles, colors } from "../src/styles/index.js";
@@ -560,9 +560,25 @@ export default function Index() {
                             onPress={() => { 
                                 if (selectedSubscription) {
                                     setMenuVisible(false);
-                                    setIsEditing(true);
-                                    setEditingId(selectedSubscription.id);
-                                    setNewPrice(selectedSubscription.amount ? selectedSubscription.amount.toString() : '');
+                                    const sub = selectedSubscription;
+                                    router.push({
+                                        pathname: '/edit',
+                                        params: {
+                                            id: sub.id,
+                                            name: sub.name,
+                                            amount: sub.amount,
+                                            frequency: sub.frequency,
+                                            nextPaymentDate: sub.next_payment_date,
+                                            isTrial: sub.isTrial,
+                                            trialEndDate: sub.trialEndDate,
+                                            categoryId: sub.categoryId,
+                                            reminderDaysBefore: sub.reminderDaysBefore,
+                                            reminderHour: sub.reminderHour,
+                                            reminderMinute: sub.reminderMinute,
+                                            cardName: sub.cardName,
+                                            language: language
+                                        }
+                                    });
                                 }
                             }}
                         >

@@ -97,3 +97,9 @@ When a subscription is past due:
 - Users can assign a card name (e.g., "Garanti", "Akbank") to each subscription
 - Card name displays on subscription card as "CardName 0001"
 - Falls back to "•••• 0001" if no card name is set
+
+### Full Edit Screen
+
+- Dedicated Edit screen (same UI as Add screen)
+- Edit all fields: Name, Amount, Category, Card Name, Dates, Reminders
+- Pre-filled with existing subscription data

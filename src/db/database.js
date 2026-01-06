@@ -126,6 +126,14 @@ export const updateAmount = async (subscriptionId, newAmount) => {
   )
 }
 
+export const updateFullSubscription = async (subscriptionId, name, amount, nextPaymentDate, categoryId, frequency, isTrial, trialEndDate, reminderDaysBefore, reminderHour, reminderMinute, cardName) => {
+  if (!db) throw new Error("Veritabanı henüz kurulmadı!");
+  return db.runAsync(
+    `UPDATE Subscriptions SET name = ?, amount = ?, nextPaymentDate = ?, categoryId = ?, frequency = ?, isTrial = ?, trialEndDate = ?, reminderDaysBefore = ?, reminderHour = ?, reminderMinute = ?, cardName = ? WHERE id = ?`,
+    [name, amount, nextPaymentDate, categoryId, frequency, isTrial ? 1 : 0, trialEndDate, reminderDaysBefore, reminderHour, reminderMinute, cardName, subscriptionId]
+  );
+}
+ 
 export const convertTrialToSubscription = async (subscriptionId) => {
   if (!db) throw new Error("Veritabanı henüz kurulmadı!");
   return db.runAsync(
