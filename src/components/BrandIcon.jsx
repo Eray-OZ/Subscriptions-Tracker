@@ -83,11 +83,21 @@ const BRAND_SLUG_MAP = {
   'amazon': 'amazon',
   'amazon prime': 'amazon',
   'amazonprime': 'amazon',
+  'prime': 'amazon',
+  'aws': 'amazonaws',
+  'amazon web services': 'amazonaws',
+  'google': 'google',
+  'google workspace': 'google',
+  'gmail': 'gmail',
+  'drive': 'googledrive',
+  'google drive': 'googledrive',
   'uber': 'uber',
   'uber one': 'uber',
   
   // Clean Aliases for Normalization Fallbacks
   'disney': 'disneyplus',
+  'youtube': 'youtube',
+  'googledrive': 'googledrive', // explicit mapping for safety
 };
 
 // Map categories to fallback icons

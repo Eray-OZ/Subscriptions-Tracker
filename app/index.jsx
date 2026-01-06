@@ -391,7 +391,7 @@ export default function Index() {
                         colors={getGradientForId(item.id)}
                         style={styles.subscriptionIconContainer}
                     >
-                        <MaterialCommunityIcons name={getIconForCategory(item.category_name)} size={26} color="white" />
+                         <BrandIcon name={item.name} category={item.category_name} size={28} />
                     </LinearGradient>
                     
                     <View style={styles.subscriptionInfo}>
