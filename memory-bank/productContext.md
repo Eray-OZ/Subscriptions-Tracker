@@ -89,3 +89,11 @@ When a subscription is past due:
 - Payment date shown on each subscription card
 - Free trials excluded from summary card totals
 - Improved touch feedback on cards
+- Credit card style subscription cards with solid color backgrounds
+- Payment proximity progress bar (white/orange/red based on days left)
+
+### Payment Card Tracking
+
+- Users can assign a card name (e.g., "Garanti", "Akbank") to each subscription
+- Card name displays on subscription card as "CardName 0001"
+- Falls back to "•••• 0001" if no card name is set

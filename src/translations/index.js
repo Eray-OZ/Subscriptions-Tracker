@@ -52,6 +52,8 @@ export const translations = {
     before3Days: '3 Days Before',
     before1Week: '1 Week Before',
     notificationTime: 'Notification Time',
+    cardName: 'Payment Card',
+    cardNamePlaceholder: 'e.g., Garanti, Akbank',
     
     // Payment Modal
     markAsPaid: 'Mark',
@@ -141,6 +143,8 @@ export const translations = {
     before3Days: '3 Gün Önce',
     before1Week: '1 Hafta Önce',
     notificationTime: 'Bildirim Saati',
+    cardName: 'Ödeme Kartı',
+    cardNamePlaceholder: 'örn., Garanti, Akbank',
     
     // Payment Modal
     markAsPaid: 'İşaretle',

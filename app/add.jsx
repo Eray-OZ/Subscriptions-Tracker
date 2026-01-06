@@ -26,6 +26,7 @@ export default function AddScreen() {
     const language = params.language || 'Turkish';
     
     const [reminderDaysBefore, setReminderDaysBefore] = useState(1);
+    const [cardName, setCardName] = useState('');
     const [reminderTime, setReminderTime] = useState(() => {
         const date = new Date();
         date.setHours(11, 30, 0, 0);
@@ -70,7 +71,8 @@ export default function AddScreen() {
                 isTrial ? dateToUse.toISOString().split('T')[0] : null,
                 reminderDaysBefore,
                 reminderHour,
-                reminderMinute
+                reminderMinute,
+                cardName.trim() || null
             );
             
             await scheduleSubscriptionNotification(newSubscriptionId, name, dateToUse, reminderDaysBefore, reminderHour, reminderMinute);
@@ -153,6 +155,17 @@ export default function AddScreen() {
                         value={amount}
                         onChangeText={setAmount}
                         keyboardType="decimal-pad"
+                    />
+                </View>
+
+                <View style={styles.labelContainer}>
+                    <Text style={styles.labelText}>{t('cardName')}</Text>
+                    <TextInput
+                        style={styles.input}
+                        placeholder={t('cardNamePlaceholder')}
+                        placeholderTextColor={colors.slate500}
+                        value={cardName}
+                        onChangeText={setCardName}
                     />
                 </View>
 

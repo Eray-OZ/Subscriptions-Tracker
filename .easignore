@@ -22,3 +22,14 @@ design/
 
 # macOS
 .DS_Store
+
+# Generated Native Build Artifacts
+ios/Pods/
+ios/build/
+ios/*.xcworkspace/
+ios/*.xcodeproj/project.xcworkspace/
+ios/*.xcodeproj/xcuserdata/
+android/app/build/
+android/.gradle/
+android/build/
+.expo/

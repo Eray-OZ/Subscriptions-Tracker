@@ -37,6 +37,11 @@ export const setupDatabase = async () => {
       await db.execAsync("ALTER TABLE Subscriptions ADD COLUMN reminderMinute INTEGER DEFAULT 30;");
     }
 
+    const hasCardName = tableInfo.some(column => column.name === 'cardName');
+    if (!hasCardName) {
+      await db.execAsync("ALTER TABLE Subscriptions ADD COLUMN cardName TEXT;");
+    }
+
     // Seed Categories if empty
     const categoryCount = await db.getFirstAsync('SELECT COUNT(*) as count FROM Categories');
     if (categoryCount.count === 0) {
@@ -54,7 +59,7 @@ export const setupDatabase = async () => {
 export const getSubscriptions = async () => {
   if (!db) throw new Error("Veritabanı henüz kurulmadı!");
   const allSubs = await db.getAllAsync(`
-    SELECT s.id, s.name, s.amount, s.nextPaymentDate as next_payment_date, c.name as category_name, s.frequency, s.isTrial, s.trialEndDate, s.reminderDaysBefore, s.reminderHour, s.reminderMinute
+    SELECT s.id, s.name, s.amount, s.nextPaymentDate as next_payment_date, c.name as category_name, s.frequency, s.isTrial, s.trialEndDate, s.reminderDaysBefore, s.reminderHour, s.reminderMinute, s.cardName
     FROM Subscriptions s
     JOIN Categories c ON s.categoryId = c.id
     ORDER BY s.id DESC
@@ -69,11 +74,11 @@ export const getCategories = async () => {
   return allCategories
 }
 
-export const addSubscription = async (name, amount, nextPaymentDate, categoryId, frequency = 'Monthly', isTrial = 0, trialEndDate = null, reminderDaysBefore = 1, reminderHour = 11, reminderMinute = 30) => {
+export const addSubscription = async (name, amount, nextPaymentDate, categoryId, frequency = 'Monthly', isTrial = 0, trialEndDate = null, reminderDaysBefore = 1, reminderHour = 11, reminderMinute = 30, cardName = null) => {
   if (!db) throw new Error("Veritabanı henüz kurulmadı!");
   const result = await db.runAsync(
-    'INSERT INTO Subscriptions (name, amount, nextPaymentDate, categoryId, frequency, isTrial, trialEndDate, reminderDaysBefore, reminderHour, reminderMinute) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-    [name, amount, nextPaymentDate, categoryId, frequency, isTrial ? 1 : 0, trialEndDate, reminderDaysBefore, reminderHour, reminderMinute]
+    'INSERT INTO Subscriptions (name, amount, nextPaymentDate, categoryId, frequency, isTrial, trialEndDate, reminderDaysBefore, reminderHour, reminderMinute, cardName) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+    [name, amount, nextPaymentDate, categoryId, frequency, isTrial ? 1 : 0, trialEndDate, reminderDaysBefore, reminderHour, reminderMinute, cardName]
   );
   return result.lastInsertRowId;
 };

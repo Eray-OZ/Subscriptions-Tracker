@@ -369,7 +369,6 @@ export default function Index() {
         const isPast = isBefore(dateToCheck, today);
         const isEditingThis = isEditing && editingId === item.id;
         
-        // Use gradient for the whole card
         return (
             <TouchableOpacity 
                 style={styles.subscriptionItem}
@@ -420,11 +419,13 @@ export default function Index() {
                         </Text>
                     </View>
 
-                    {/* Bottom Row: ID + Date */}
+                    {/* Bottom Row: Card Name + ID + Date */}
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end' }}>
-                         {/* Account ID / Decoration */}
-                        <Text style={{ color: 'rgba(255,255,255,0.6)', fontSize: 14, letterSpacing: 3, fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace' }}>
-                            •••• {item.id ? item.id.toString().padStart(4, '0').slice(-4) : '0000'}
+                         {/* Card Name or ID */}
+                        <Text style={{ color: 'rgba(255,255,255,0.6)', fontSize: 14, letterSpacing: item.cardName ? 1 : 3, fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace' }}>
+                            {item.cardName 
+                                ? `${item.cardName} ${item.id ? item.id.toString().padStart(4, '0').slice(-4) : '0000'}` 
+                                : `•••• ${item.id ? item.id.toString().padStart(4, '0').slice(-4) : '0000'}`}
                         </Text>
 
                         <View style={{ alignItems: 'flex-end' }}>
@@ -463,7 +464,7 @@ export default function Index() {
                         <View style={{ 
                             height: '100%', 
                             width: `${Math.max(5, Math.min(100, ((30 - remainingDays) / 30) * 100))}%`, 
-                            backgroundColor: item.isTrial ? '#818cf8' : (remainingDays <= 3 ? '#ef4444' : (remainingDays <= 7 ? '#f59e0b' : '#34d399')),
+                            backgroundColor: item.isTrial ? '#ffffff' : (remainingDays <= 3 ? '#ef4444' : (remainingDays <= 7 ? '#f59e0b' : '#ffffff')),
                             borderRadius: 2
                         }} />
                     </View>

@@ -7,7 +7,7 @@
     "icon": "./assets/app-icon.png",
     "scheme": "subtracker",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
+    "newArchEnabled": false,
     "ios": {
       "bundleIdentifier": "com.erayoz.subtracker",
       "supportsTablet": true
@@ -45,6 +45,17 @@
       ],
       "expo-sqlite",
       [
+        "expo-build-properties",
+        {
+          "android": {
+            "kotlinVersion": "1.9.24",
+            "compileSdkVersion": 35,
+            "targetSdkVersion": 35,
+            "buildToolsVersion": "35.0.0"
+          }
+        }
+      ],
+      [
         "react-native-android-widget",
         {
           "widgets": [
@@ -63,7 +74,8 @@
       ],
       "@react-native-community/datetimepicker",
       "expo-web-browser",
-      "expo-secure-store"
+      "expo-secure-store",
+      "expo-build-properties"
     ],
     "experiments": {
       "typedRoutes": true,
