@@ -15,7 +15,10 @@ data class WidgetData(
     val upcomingPayments: List<UpcomingPayment>,
     
     @SerializedName("translations")
-    val translations: WidgetTranslations
+    val translations: WidgetTranslations,
+
+    @SerializedName("language")
+    val language: String?
 )
 
 data class UpcomingPayment(

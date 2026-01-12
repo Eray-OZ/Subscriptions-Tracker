@@ -7,9 +7,10 @@
 
 - **Styled Android widget to match iOS (Dark theme, Date Badges, Row Layout)**
 - **Implemented reliable update mechanism (Sync Commit + Custom Broadcast)**
-- **Optimized widget density (Reduced padding, removed item limits)**
-- **Enabled widget resizing (2x2 and 2x4 support)**
-- Verified widget data flow and UI rendering
+- **Fixed widget date localization (Pass 'tr'/'en' to native)**
+- **Optimized widget density & capacity (Up to 10 items, dynamic resizing)**
+- **Styled Android widget to match iOS (Dark theme, Date Badges)**
+- Verified widget data flow, resizing, and localization
 
 ## Next Steps
 

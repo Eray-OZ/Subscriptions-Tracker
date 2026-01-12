@@ -82,8 +82,8 @@ class SubTrackerWidget : AppWidgetProvider() {
                 views.removeAllViews(R.id.widget_payments_container)
                 
                 // Removed unreliable height calculation
-                // Just show up to 6 items and let the widget layout handle clipping vs showing
-                val maxItems = 6
+                // Just show up to 10 items and let the widget layout handle clipping vs showing
+                val maxItems = 10
                 
                 Log.d("SubTrackerWidget", "Displaying max $maxItems items")
 
@@ -101,7 +101,7 @@ class SubTrackerWidget : AppWidgetProvider() {
                     row.setTextViewText(R.id.payment_amount, amountText)
                     
                     // Set Date Badge
-                    val badgeText = formatDateBadge(payment.daysLeft, widgetData.translations)
+                    val badgeText = formatDateBadge(payment.daysLeft, widgetData.translations, widgetData.language)
                     row.setTextViewText(R.id.payment_date, badgeText)
                     
                     // Set Badge Color
@@ -144,7 +144,7 @@ class SubTrackerWidget : AppWidgetProvider() {
             }
         }
         
-        private fun formatDateBadge(daysLeft: Int, translations: WidgetTranslations): String {
+        private fun formatDateBadge(daysLeft: Int, translations: WidgetTranslations, languageCode: String?): String {
             if (daysLeft == 0) return translations.today
             
             // Calculate future date
@@ -152,8 +152,9 @@ class SubTrackerWidget : AppWidgetProvider() {
             calendar.add(Calendar.DAY_OF_YEAR, daysLeft)
             
             // Format as "15 JAN"
-            val formatter = SimpleDateFormat("d MMM", Locale.ENGLISH)
-            return formatter.format(calendar.time).uppercase()
+            val locale = if (languageCode == "tr") Locale("tr", "TR") else Locale.ENGLISH
+            val formatter = SimpleDateFormat("d MMM", locale)
+            return formatter.format(calendar.time).uppercase(locale)
         }
         
         private fun getBadgeColor(daysLeft: Int): Int {

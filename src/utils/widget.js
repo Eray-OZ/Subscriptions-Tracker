@@ -63,11 +63,12 @@ const calculateWidgetData = (subscriptions, language) => {
         })
         .filter(sub => sub.daysLeft >= 0)
         .sort((a, b) => a.daysLeft - b.daysLeft)
-        .slice(0, 5); // Get closest 5
+        .slice(0, 10); // Get closest 10
 
     return {
         currency: currencySymbol,
         translations,
-        upcomingPayments
+        upcomingPayments,
+        language: language === 'Turkish' ? 'tr' : 'en'
     };
 };
