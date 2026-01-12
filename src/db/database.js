@@ -55,7 +55,7 @@ export const setupDatabase = async () => {
       `);
     }
   } catch (e) {
-    console.log("Migration or seeding error:", e);
+    console.error("Migration or seeding error:", e);
   }
 };
 

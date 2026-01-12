@@ -14,9 +14,6 @@ export const updateWidgetData = async (subscriptions, language = 'Turkish') => {
     try {
         if (NativeModules.WidgetModule) {
             await NativeModules.WidgetModule.updateWidgetData(JSON.stringify(data));
-            console.log('[Widget] Updated successfully');
-        } else {
-            console.log('[Widget] WidgetModule not available - requires native build');
         }
     } catch (error) {
         console.warn('[Widget] Update failed:', error);

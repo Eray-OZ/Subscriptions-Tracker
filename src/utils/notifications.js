@@ -29,7 +29,6 @@ export const setupNotificationHandler = () => {
  */
 export const requestNotificationPermissions = async () => {
     if (isExpoGo) {
-        console.log('Notifications are not supported in Expo Go. Build a development build for full support.');
         return false;
     }
 
@@ -122,7 +121,6 @@ export const cancelSubscriptionNotification = async (id) => {
  */
 export const rescheduleAllNotifications = async (subscriptions) => {
     if (isExpoGo) {
-        console.log('Skipping notification scheduling in Expo Go.');
         return;
     }
 

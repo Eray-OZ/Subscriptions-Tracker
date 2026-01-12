@@ -24,6 +24,10 @@ export const useFilters = (subscriptions, language) => {
             }
             
             return true;
+        }).sort((a, b) => {
+            const dateA = new Date(a.next_payment_date);
+            const dateB = new Date(b.next_payment_date);
+            return dateA - dateB;
         });
     }, [subscriptions, searchQuery, selectedCategories, selectedFrequencies]);
 

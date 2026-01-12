@@ -10,24 +10,16 @@ import { getCurrency, getTranslation } from "../translations";
 export const updateiOSWidget = async (data) => {
   // Only run on iOS
   if (Platform.OS !== "ios") {
-    // console.log("iOS widget: Not iOS, skipping");
     return;
   }
-
-  // console.log("iOS widget: Attempting to update with data:", JSON.stringify(data));
 
   try {
     // Check if the native module exists (only available in native builds)
     if (NativeModules.WidgetModule) {
-      // console.log("iOS widget: WidgetModule found, calling updateWidgetData");
       await NativeModules.WidgetModule.updateWidgetData(JSON.stringify(data));
-      // console.log("iOS widget updated successfully");
-    } else {
-      // Native module not available
-      console.log("iOS WidgetModule not available - requires native build");
     }
   } catch (error) {
-    console.log("iOS widget update failed:", error);
+    console.error("iOS widget update failed:", error);
   }
 };
 
