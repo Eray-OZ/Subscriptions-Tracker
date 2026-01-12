@@ -369,7 +369,7 @@ export default function Index() {
                 activeOpacity={0.9}
                 onLongPress={() => handleLongPress(item)}
                 delayLongPress={200}
-                onPress={() => openModal(item)} // Single tap to confirm/details
+                onPress={() => handleLongPress(item)} // Single tap now shows menu too
             >
                 <LinearGradient
                     colors={getGradientForId(item.id)}
@@ -465,7 +465,21 @@ export default function Index() {
                         <View style={{ 
                             height: '100%', 
                             width: `${Math.max(5, Math.min(100, ((30 - remainingDays) / 30) * 100))}%`, 
-                            backgroundColor: item.isTrial ? '#ffffff' : (remainingDays <= 3 ? '#ef4444' : (remainingDays <= 7 ? '#f59e0b' : '#ffffff')),
+                            backgroundColor: (() => {
+                                if (item.isTrial) return '#ffffff';
+                                const gradient = getGradientForId(item.id);
+                                const isRedCard = gradient[0] === '#dc2626';
+                                const isAmberCard = gradient[0] === '#d97706';
+                                
+                                if (remainingDays <= 3) {
+                                    // Urgent (Red): Use White on Red cards, Red otherwise
+                                    return isRedCard ? '#ffffff' : '#ef4444';
+                                } else if (remainingDays <= 7) {
+                                    // Warning (Orange): Use White on Amber cards, Orange otherwise
+                                    return isAmberCard ? '#ffffff' : '#f59e0b';
+                                }
+                                return '#ffffff';
+                            })(),
                             borderRadius: 2
                         }} />
                     </View>

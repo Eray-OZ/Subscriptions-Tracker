@@ -10,10 +10,11 @@
 - **Notifications**: Scheduled reminders 1 day before payment
 - **App Launch Sync**: Notifications rescheduled on startup
 - **Android Widget**: Native Kotlin widget fully implemented (UI, Data Flow, Resizing)
+- **UI/UX Polish**: Shadow removal, high-contrast progress bars, unified gestures
 
 ## Pending 🔄
 
-- [ ] APK build and physical device testing
+- [ ] Verify installation on physical device
 - [ ] Notification sound/vibration settings
 - [ ] Payment history screen
 

@@ -1,4 +1,4 @@
-import { StyleSheet, Dimensions } from 'react-native';
+import { StyleSheet, Dimensions, Platform } from 'react-native';
 
 const { width } = Dimensions.get('window');
 
@@ -112,6 +112,7 @@ export const styles = StyleSheet.create({
     borderColor: 'rgba(255, 255, 255, 0.1)',
     overflow: 'hidden',
     ...shadows.glow,
+    ...(Platform.OS === 'android' ? { elevation: 0 } : {}),
   },
   summaryCardGradient: {
     position: 'absolute',

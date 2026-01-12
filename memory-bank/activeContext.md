@@ -7,9 +7,11 @@
 
 - **Styled Android widget to match iOS (Dark theme, Date Badges, Row Layout)**
 - **Implemented reliable update mechanism (Sync Commit + Custom Broadcast)**
+- **Polished Android UI (Removed summary shadow, fixed red bar contrast)**
+- **Improved Card Interaction (Single tap now opens menu)**
+- **Built & Verified Debug APK for physical device testing**
 - **Fixed widget date localization (Pass 'tr'/'en' to native)**
 - **Optimized widget density & capacity (Up to 10 items, dynamic resizing)**
-- **Styled Android widget to match iOS (Dark theme, Date Badges)**
 - Verified widget data flow, resizing, and localization
 
 ## Next Steps
