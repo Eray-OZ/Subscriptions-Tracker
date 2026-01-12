@@ -3,7 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:paddingVertical="4dp">
+    android:gravity="center_vertical"
+    android:paddingVertical="5dp">
 
     <TextView
         android:id="@+id/payment_name"
@@ -17,19 +18,22 @@
 
     <TextView
         android:id="@+id/payment_amount"
-        android:layout_width="85dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="#AAAAAA"
-        android:textSize="13sp"
-        android:gravity="end"
-        android:paddingEnd="8dp" />
+        android:textSize="12sp"
+        android:paddingHorizontal="10dp" />
 
     <TextView
         android:id="@+id/payment_date"
-        android:layout_width="60dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="#888888"
-        android:textSize="12sp"
-        android:gravity="end" />
+        android:textSize="11sp"
+        android:textStyle="bold"
+        android:textColor="#000000"
+        android:paddingHorizontal="8dp"
+        android:paddingVertical="3dp"
+        android:minWidth="50dp"
+        android:gravity="center" />
 
 </LinearLayout>
