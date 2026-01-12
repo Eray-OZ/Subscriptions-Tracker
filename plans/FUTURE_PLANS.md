@@ -180,3 +180,28 @@ Visual overview of upcoming payments.
 - Price change tracking
 - Shared subscription management
 - Smart suggestions (cancel unused)
+
+---
+
+### 7. 🎨 Customizable Icons & Colors
+
+**Priority: High (User Requested)**
+
+Allows users to personalize their subscription cards for better visual organization.
+
+**Features:**
+
+- Select custom icon from a preset library (streaming, utilities, etc.)
+- Choose custom card background color (solid or gradient)
+- "Color Picker" in Add/Edit screens
+- "Icon Picker" in Add/Edit screens
+
+**Database Changes:**
+
+- Add `icon_name` (string) to local database
+- Add `card_color` (string/hex) to local database
+
+**UI Changes:**
+
+- New input sections in `app/add.jsx` and `app/edit.jsx`
+- Rendering logic update in `app/index.jsx` to use stored color/icon

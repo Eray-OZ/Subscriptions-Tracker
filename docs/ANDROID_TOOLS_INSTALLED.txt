@@ -1,0 +1,71 @@
+# Android Development Tools Downloaded (January 2026)
+
+## Total Size: ~17GB (Including NDK and CMake)
+
+### 1. Android Emulator (~372MB)
+- Location: ~/Library/Android/sdk/emulator/
+- Purpose: Virtual Android devices for testing
+- Uses: ARM virtualization (native on Apple Silicon M4)
+
+### 2. Android SDK Build-Tools 36.1 (~76.8MB)
+- Location: ~/Library/Android/sdk/build-tools/36.1/
+- Purpose: Compile, package, and sign Android apps
+- Includes: aapt2, dex compiler, zipalign
+
+### 3. Android SDK Platform 36 (~62.8MB)
+- Location: ~/Library/Android/sdk/platforms/android-36/
+- Purpose: Target API level for app development
+- Compatibility: Android 14+
+
+### 4. Android SDK Platform-Tools (~15MB)
+- Location: ~/Library/Android/sdk/platform-tools/
+- Purpose: Core debugging and device tools
+- Includes: adb, fastboot
+
+### 5. Google Play ARM 64 v8a System Image (~1.82GB)
+- Location: ~/Library/Android/sdk/system-images/
+- Purpose: Emulator system image for ARM Macs (M1/M2/M3/M4)
+- Optimized: Native performance on Apple Silicon
+
+### 6. Sources for Android 36 (~49.3MB)
+- Location: ~/Library/Android/sdk/sources/android-36/
+- Purpose: Android source code for debugging reference
+
+### 7. Android SDK Build-Tools 35 (~76MB)
+- Location: ~/Library/Android/sdk/build-tools/35.0.0/
+- Purpose: Additional build tools for SDK 35
+- Auto-installed: Required for project compilation
+
+### 8. Android SDK Platform 35 (~62MB)
+- Location: ~/Library/Android/sdk/platforms/android-35/
+- Purpose: Android 14 platform API
+- Auto-installed: Required for project compilation
+
+### 9. NDK (Side by side) 27.1.12297006 (~1.5GB)
+- Location: ~/Library/Android/sdk/ndk/27.1.12297006/
+- Purpose: Native Development Kit for C/C++ modules
+- Auto-installed: Required for React Native native modules
+- Used by: Reanimated, expo-modules-core
+
+### 10. CMake 3.22.1 (~100MB)
+- Location: ~/Library/Android/sdk/cmake/3.22.1/
+- Purpose: Build system for native C/C++ code
+- Auto-installed: Required for building native modules
+- Used by: expo-modules-core and other native dependencies
+
+---
+
+## Environment Variables (~/.zshrc):
+```bash
+export ANDROID_HOME=$HOME/Library/Android/sdk
+export PATH=$PATH:$ANDROID_HOME/emulator
+export PATH=$PATH:$ANDROID_HOME/platform-tools
+```
+
+## Commands:
+- Reload shell: `source ~/.zshrc`
+- Check ADB: `adb --version`
+- List emulators: `emulator -list-avds`
+- Start emulator: `emulator -avd <device_name>`
+- Run Expo on Android: `npx expo start` then press `a`
+- Local build: `npx expo run:android`
