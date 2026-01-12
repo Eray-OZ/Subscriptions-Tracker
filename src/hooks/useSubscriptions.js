@@ -26,7 +26,22 @@ export const useSubscriptions = (language) => {
         try {
             setLoading(true);
             const data = await getSubscriptions();
-            setSubscriptions(data);
+            // Sort by closest payment date (days remaining)
+            const sortedData = data.sort((a, b) => {
+                // Calculate days remaining without mutating
+                const today = new Date();
+                
+                // Helper to get next date object
+                const getNextDate = (sub) => new Date(sub.next_payment_date);
+                
+                const dateA = getNextDate(a);
+                const dateB = getNextDate(b);
+                
+                // Compare dates directly
+                return dateA - dateB;
+            });
+            
+            setSubscriptions(sortedData);
             
             const cats = await getCategories();
             setAllCategories(cats);

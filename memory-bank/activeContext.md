@@ -20,16 +20,19 @@
 - **Created Master Plan Index (`plans/PLANS.md`)**
 - **Verified Notification Reliability Strategy**
 - **Finalized All Optimization Plans**
-- **Built Release APK (New Architecture + Kotlin 2.0.21)**
-- **Fixed Android Widget row alignment (Fixed column widths)**
-- **Restored `scheme` in `app.json` (required for deep linking)**
-- **Optimized Repository Size (Updated `.gitignore` for build artifacts)**
+- **Fixed Missing Android Widget (Added `<receiver>` to Manifest)**
+- **Implemented "Sort by Closest Date" (UX Improvement)**
+- **Fixed Time Picker (Forced 24h format + Current Time default)**
+- **Verified Notification Delivery on Physical Device**
+- **Created `plans/RELEASE_FIXES.md` and `plans/TEST_PLANS.md`**
 
 ## Next Steps
 
-1. APK build and physical device testing
-2. Payment history screen logic (if further refinement needed)
-3. Customizable Icons & Colors (Future Phase)
+1. Fix Notification Icon (Old asset issues)
+2. Redesign Summary Card (Pending Decision)
+3. Fix Splash Screen (Deferred)
+4. Payment history screen logic (if further refinement needed)
+5. Customizable Icons & Colors (Future Phase)
 
 ## Next Steps
 

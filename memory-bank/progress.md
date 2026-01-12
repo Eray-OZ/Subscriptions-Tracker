@@ -18,12 +18,14 @@
 - **Notification Reliability**: Reschedule-on-launch strategy implemented
 - **Reliability Plans**: Documented in `plans/NOTIFICATION_RELIABILITY_PLANS.md`
 - **Plans Index**: Master index created at `plans/PLANS.md`
-- **Release Build**: Successful Production APK build (New Arch enabled)
-- **Repo Health**: Optimized `.gitignore` to exclude heavy build artifacts
+- **Sort by Closest**: Subscriptions sorted by next payment date
+- **Time Picker**: 24h format support and better defaults
+- **Bug Fixes**: Android Widget appearing, Deep Linking, Notifications verified
 
 ## Pending 🔄
 
-- [ ] Verify installation on physical device
+- [ ] Fix Notification Icon (Asset update)
+- [ ] Redesign Summary Card
 - [ ] Customizable Icons & Colors (Future)
 
 ## Known Issues ⚠️
