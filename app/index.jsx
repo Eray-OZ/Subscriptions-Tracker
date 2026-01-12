@@ -1,5 +1,5 @@
 import { useState, useCallback, useMemo, useEffect } from "react";
-import { FlatList, Text, View, TouchableOpacity, Modal, TextInput, Platform, ScrollView } from "react-native";
+import { FlatList, Text, View, TouchableOpacity, Platform } from "react-native";
 import { Link, router } from "expo-router";
 import { useFocusEffect } from "@react-navigation/native";
 import { getSubscriptions, getCategories, deleteSubscription, addPaymentToHistory, updateSubscription, updateAmount, getPaymentHistoryBySubscription, getPaymentHistory } from "../src/db/database";
@@ -8,177 +8,21 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { LinearGradient } from 'expo-linear-gradient';
 import { isBefore, format, differenceInCalendarDays } from 'date-fns';
 import { tr } from 'date-fns/locale';
-import DateTimePicker from '@react-native-community/datetimepicker';
 import { scheduleSubscriptionNotification, cancelSubscriptionNotification } from '../src/utils/notifications';
 import { updateWidgetData } from "../src/utils/widget";
 import { updateiOSWidget, calculateWidgetData } from "../src/utils/iosWidget";
-import { getTranslation, getCurrency, getCategoryTranslation, getFrequencyAbbr } from '../src/translations';
+import { getTranslation, getCurrency, getCategoryTranslation } from '../src/translations';
+import { SubscriptionItem } from '../src/components/SubscriptionItem';
+import { PaymentModal, MenuModal, HistoryModal } from '../src/components/SubscriptionModals';
+import { FilterModal } from '../src/components/FilterModal';
 import { BrandIcon } from '../src/components/BrandIcon';
+import { SummaryCard } from '../src/components/SummaryCard';
 import { saveLanguage, loadLanguage } from '../src/utils/language';
 
 
 
 // Medium-dark, muted colors for cards
-const gradients = [
-    ['#2563eb', '#1d4ed8'], // Medium Blue
-    ['#dc2626', '#b91c1c'], // Medium Red
-    ['#059669', '#047857'], // Medium Emerald
-    ['#d97706', '#b45309'], // Medium Amber
-    ['#7c3aed', '#6d28d9'], // Medium Violet
-    ['#475569', '#334155'], // Medium Slate
-    ['#db2777', '#be123c'], // Medium Pink
-    ['#0891b2', '#0e7490'], // Medium Cyan
-];
-
-const getGradientForId = (id) => {
-    return gradients[id % gradients.length];
-};
-
-const getIconForCategory = (category) => {
-    switch (category) {
-        case 'Bills': return 'receipt';
-        case 'Movie Streaming': return 'movie';
-        case 'Music': return 'music-note';
-        case 'Gaming': return 'gamepad-variant';
-        case 'Software': return 'code-braces';
-        case 'Cloud': return 'cloud';
-        case 'Reading': return 'book-open-page-variant';
-        case 'Shopping': return 'cart';
-        case 'Gym': return 'dumbbell';
-        case 'Others': return 'shape-outline';
-        default: return 'help-circle';
-    }
-}
-
-const getStatusStyle = (remainingDays, isPast) => {
-    if (isPast || remainingDays <= 2) {
-        return { dot: styles.statusDotUrgent, text: styles.statusTextUrgent, color: colors.red500 };
-    } else if (remainingDays <= 7) {
-        return { dot: styles.statusDotWarning, text: styles.statusTextWarning, color: '#f59e0b' };
-    } else if (remainingDays <= 14) {
-        return { dot: styles.statusDotGood, text: styles.statusTextGood, color: colors.emerald500 };
-    }
-    return { dot: styles.statusDotNeutral, text: styles.statusTextNeutral, color: colors.slate500 };
-};
-
-// Summary Card Component
-const SummaryCard = ({ subscriptions, language }) => {
-    const [viewMode, setViewMode] = useState('Total'); // 'Weekly', 'Monthly', 'Yearly', 'Total'
-    const t = (key) => getTranslation(language, key);
-
-    const stats = useMemo(() => {
-        let displayTotal = 0;
-        let displayLabel = 'spend';
-        let filteredSubs = [];
-
-        // Filter out free trials from calculations
-        const paidSubscriptions = subscriptions.filter(sub => !sub.isTrial);
-
-        if (viewMode === 'Total') {
-            // Normalize all amounts to Monthly, then display
-            const normalizedSubs = paidSubscriptions.map(sub => {
-                let monthlyAmount = sub.amount;
-                if (sub.frequency === 'Weekly') monthlyAmount = sub.amount * 4.33;
-                else if (sub.frequency === 'Yearly') monthlyAmount = sub.amount / 12;
-                return {
-                    ...sub,
-                    normalizedAmount: monthlyAmount
-                };
-            });
-            displayTotal = normalizedSubs.reduce((sum, sub) => sum + sub.normalizedAmount, 0);
-            filteredSubs = normalizedSubs;
-            displayLabel = t('monthlySpendTotal');
-        } else {
-            // Filter by frequency and show raw amounts
-            filteredSubs = paidSubscriptions.filter(sub => sub.frequency === viewMode);
-            displayTotal = filteredSubs.reduce((sum, sub) => sum + sub.amount, 0);
-            displayLabel = viewMode === 'Weekly' ? t('weeklySpend') : viewMode === 'Monthly' ? t('monthlySpend') : t('yearlySpend');
-        }
-
-        const count = filteredSubs.length;
-        const avg = count > 0 ? displayTotal / count : 0;
-        
-        // Calculate highest in the filtered set
-        let highestSub = null;
-        let highestAmount = 0;
-        
-        filteredSubs.forEach(sub => {
-            const amount = viewMode === 'Total' ? sub.normalizedAmount : sub.amount;
-            if (amount > highestAmount) {
-                highestAmount = amount;
-                highestSub = sub;
-            }
-        });
-
-        const [dollars, cents] = displayTotal.toFixed(2).split('.');
-        
-        return { total: displayTotal, dollars, cents, count, avg, highest: highestSub, highestAmount, displayLabel };
-
-    }, [subscriptions, viewMode, language]);
-
-
-
-
-    const currentMonth = language === 'Turkish' 
-        ? format(new Date(), 'MMMM yyyy', { locale: tr })
-        : format(new Date(), 'MMMM yyyy');
-
-    const renderToggle = (modeKey, displayText) => (
-        <TouchableOpacity 
-            style={[styles.summaryToggleBtn, viewMode === modeKey && styles.summaryToggleBtnActive]} 
-            onPress={() => setViewMode(modeKey)}
-        >
-            <Text style={[styles.summaryToggleText, viewMode === modeKey && styles.summaryToggleTextActive]}>
-                {displayText}
-            </Text>
-        </TouchableOpacity>
-    );
-
-    return (
-        <View style={styles.summaryCardContainer}>
-            <View style={styles.summaryCard}>
-                {/* Gradient glow effect */}
-                <View style={styles.summaryCardGradient} />
-                
-                <View style={styles.summaryToggleContainer}>
-                    {renderToggle('Weekly', t('weekly'))}
-                    {renderToggle('Monthly', t('monthly'))}
-                    {renderToggle('Yearly', t('yearly'))}
-                    {renderToggle('Total', t('total'))}
-                </View>
-
-                <View style={styles.summaryCardHeader}>
-                    <View>
-                        <View style={styles.summaryBadge}>
-                            <View style={[styles.summaryBadgeDot, { backgroundColor: 'white' }]} />
-                            <Text style={styles.summaryBadgeText}>{currentMonth}</Text>
-                        </View>
-                        <View style={styles.summaryAmount}>
-                            <Text style={styles.summaryAmountMain}>{getCurrency(language)}{stats.dollars}</Text>
-                            <Text style={styles.summaryAmountDecimal}>.{stats.cents}</Text>
-                        </View>
-                        <Text style={styles.summaryLabel}>{t('totalSpend')} {stats.displayLabel}</Text>
-                    </View>
-                </View>
-
-                <View style={styles.summaryStats}>
-                    <View style={styles.summaryStat}>
-                        <Text style={styles.summaryStatLabel}>{t('active')}</Text>
-                        <Text style={styles.summaryStatValue}>{stats.count} {t('subs')}</Text>
-                    </View>
-                    <View style={[styles.summaryStat, styles.summaryStatBorder]}>
-                        <Text style={styles.summaryStatLabel}>{t('avg')}</Text>
-                        <Text style={styles.summaryStatValue}>{getCurrency(language)}{stats.avg.toFixed(2)}</Text>
-                    </View>
-                    <View style={[styles.summaryStat, styles.summaryStatBorder]}>
-                        <Text style={styles.summaryStatLabel}>{t('highest')}</Text>
-                        <Text style={styles.summaryStatValue}>{stats.highest?.name || '-'}</Text>
-                    </View>
-                </View>
-            </View>
-        </View>
-    );
-};
+import { gradients, getGradientForId, getIconForCategory, getStatusStyle } from '../src/utils/theme';
 
 
 export default function Index() {
@@ -356,454 +200,98 @@ export default function Index() {
         setHistoryVisible(true);
     };
 
-    const renderItem = ({ item }) => {
-        const today = new Date();
-        const dateToCheck = item.isTrial && item.trialEndDate ? new Date(item.trialEndDate) : new Date(item.next_payment_date);
-        const remainingDays = differenceInCalendarDays(dateToCheck, today);
-        const isPast = isBefore(dateToCheck, today);
-        const isEditingThis = isEditing && editingId === item.id;
-        
-        return (
-            <TouchableOpacity 
-                style={styles.subscriptionItem}
-                activeOpacity={0.9}
-                onLongPress={() => handleLongPress(item)}
-                delayLongPress={200}
-                onPress={() => handleLongPress(item)} // Single tap now shows menu too
-            >
-                <LinearGradient
-                    colors={getGradientForId(item.id)}
-                    style={styles.subscriptionItemGradient}
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 1, y: 1 }}
-                >
-                    {/* Top Row: Icon + Trial Badge + Amount */}
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-                             <View style={{ 
-                                 backgroundColor: 'rgba(255,255,255,0.25)', 
-                                 borderRadius: 12, 
-                                 padding: 8,
-                                 backdropFilter: 'blur(10px)' 
-                             }}>
-                                <BrandIcon name={item.name} category={item.category_name} size={28} color="white" />
-                             </View>
-                             {item.isTrial ? (
-                                <View style={{ backgroundColor: 'rgba(255,255,255,0.9)', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6 }}>
-                                    <Text style={{ fontSize: 10, fontWeight: '800', color: '#7c3aed' }}>{t('trial').toUpperCase()}</Text>
-                                </View>
-                             ) : null}
-                         </View>
-                         
-                         {!isEditingThis ? (
-                             <Text style={{ fontSize: 24, fontWeight: '800', color: 'white', letterSpacing: -1 }}>
-                                {getCurrency(language)}{item.amount.toFixed(2)}
-                             </Text>
-                         ) : (
-                            <TextInput
-                                style={styles.subscriptionAmountInput}
-                                value={newPrice}
-                                onChangeText={setNewPrice}
-                                keyboardType="numeric"
-                                autoFocus
-                            />
-                         )}
-                    </View>
-
-                    {/* Middle: Name and Category (Moved here) */}
-                    <View style={{ flex: 1, justifyContent: 'center', paddingTop: 24 }}>
-                         <Text style={{ color: 'rgba(255,255,255,0.7)', fontSize: 10, fontWeight: '700', letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: 4 }}>
-                            {getCategoryTranslation(language, item.category_name)}
-                        </Text>
-                        <Text style={{ fontSize: 22, fontWeight: '700', color: 'white', letterSpacing: 0.5, textShadowColor: 'rgba(0,0,0,0.2)', textShadowRadius: 4 }}>
-                            {item.name}
-                        </Text>
-                    </View>
-
-                    {/* Bottom Row: Card Name + ID + Date */}
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end' }}>
-                         {/* Card Name or ID */}
-                        <Text style={{ color: 'rgba(255,255,255,0.6)', fontSize: 14, letterSpacing: item.cardName ? 1 : 3, fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace' }}>
-                            {item.cardName 
-                                ? `${item.cardName} ${item.id ? item.id.toString().padStart(4, '0').slice(-4) : '0000'}` 
-                                : `•••• ${item.id ? item.id.toString().padStart(4, '0').slice(-4) : '0000'}`}
-                        </Text>
-
-                        <View style={{ alignItems: 'flex-end' }}>
-                            <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: 4 }}>
-                                <Text style={{ color: 'rgba(255,255,255,0.8)', fontSize: 8, fontWeight: '600' }}>
-                                    {isPast ? 'OVERDUE' : 'EXP'}
-                                </Text>
-                                <Text style={{ fontSize: 12, fontWeight: '700', color: 'white' }}>
-                                    {format(dateToCheck, 'dd/MM')}
-                                </Text>
-                            </View>
-
-                            {/* Days Left Badge */}
-                            <View style={{ 
-                                backgroundColor: isPast ? 'rgba(239, 68, 68, 0.9)' : 'rgba(255,255,255,0.2)', 
-                                paddingHorizontal: 8, 
-                                paddingVertical: 2, 
-                                borderRadius: 8, 
-                                marginTop: 4 
-                            }}>
-                                <Text style={{ fontSize: 10, fontWeight: 'bold', color: 'white' }}>
-                                    {remainingDays < 0 
-                                        ? `${Math.abs(remainingDays)} ${t('daysOverdue').toUpperCase()}`
-                                        : `${remainingDays} ${t('daysLeft').toUpperCase()}`
-                                    }
-                                </Text>
-                            </View>
-                        </View>
-                    </View>
-
-                    {/* Progress Bar (Payment Proximity) */}
-                    <View style={{ 
-                        height: 4, 
-                        backgroundColor: 'rgba(255,255,255,0.2)', 
-                        borderRadius: 2, 
-                        marginTop: 16, 
-                        overflow: 'hidden' 
-                    }}>
-                        <View style={{ 
-                            height: '100%', 
-                            width: `${Math.max(5, Math.min(100, ((30 - remainingDays) / 30) * 100))}%`, 
-                            backgroundColor: (() => {
-                                if (item.isTrial) return '#ffffff';
-                                const gradient = getGradientForId(item.id);
-                                const isRedCard = gradient[0] === '#dc2626';
-                                const isAmberCard = gradient[0] === '#d97706';
-                                
-                                if (remainingDays <= 3) {
-                                    // Urgent (Red): Use White on Red cards, Red otherwise
-                                    return isRedCard ? '#ffffff' : '#ef4444';
-                                } else if (remainingDays <= 7) {
-                                    // Warning (Orange): Use White on Amber cards, Orange otherwise
-                                    return isAmberCard ? '#ffffff' : '#f59e0b';
-                                }
-                                return '#ffffff';
-                            })(),
-                            borderRadius: 2
-                        }} />
-                    </View>
-                </LinearGradient>
-            </TouchableOpacity>
-        );
-    };
+    const renderItem = ({ item }) => (
+        <SubscriptionItem 
+            item={item}
+            language={language}
+            onLongPress={handleLongPress}
+            isEditing={isEditing}
+            editingId={editingId}
+            newPrice={newPrice}
+            setNewPrice={setNewPrice}
+        />
+    );
 
     return (
         <View style={styles.container}>
-            <Modal
-                animationType="fade"
-                transparent={true}
+            <PaymentModal
                 visible={isModalVisible}
-                onRequestClose={() => {
-                    setModalVisible(!isModalVisible);
-                }}
-            >
-                <View style={styles.centeredView}>
-                    <View style={styles.modalView}>
-                        <Text style={styles.modalText}>Mark {selectedSubscription?.name} as paid?</Text>
+                onClose={() => setModalVisible(false)}
+                selectedSubscription={selectedSubscription}
+                newPaymentDate={newPaymentDate}
+                showDatePicker={showDatePicker}
+                setShowDatePicker={setShowDatePicker}
+                onDateChange={onDateChange}
+                onConfirm={handleConfirmPayment}
+                language={language}
+            />
 
-                        <View style={styles.datePickerContainer}>
-                            <Text style={styles.datePickerLabel}>Next Payment Date</Text>
-                            <TouchableOpacity onPress={() => setShowDatePicker(true)} style={styles.datePickerInputContainer}>
-                                <Text style={styles.datePickerInput}>{format(newPaymentDate, 'yyyy-MM-dd')}</Text>
-                            </TouchableOpacity>
-                            {showDatePicker && (
-                                <DateTimePicker
-                                    testID="dateTimePicker"
-                                    value={newPaymentDate}
-                                    mode={"date"}
-                                    is24Hour={true}
-                                    display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-                                    onChange={onDateChange}
-                                />
-                            )}
-                        </View>
-
-                        <View style={styles.modalButtonContainer}>
-                            <TouchableOpacity
-                                style={[styles.modalButton, styles.cancelButton]}
-                                onPress={() => setModalVisible(false)}
-                            >
-                                <Text style={styles.cancelButtonText}>Cancel</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity
-                                style={[styles.modalButton, styles.confirmButton]}
-                                onPress={handleConfirmPayment}
-                            >
-                                <Text style={styles.confirmButtonText}>Confirm</Text>
-                            </TouchableOpacity>
-                        </View>
-                    </View>
-                </View>
-            </Modal>
-
-            {/* Menu Modal (Long Press) */}
-            <Modal
-                animationType="fade"
-                transparent={true}
+            <MenuModal 
                 visible={isMenuVisible}
-                onRequestClose={() => setMenuVisible(false)}
-            >
-                <TouchableOpacity 
-                    style={styles.modalOverlay} 
-                    activeOpacity={1} 
-                    onPress={() => setMenuVisible(false)}
-                >
-                    <View style={styles.menuModalContent}>
-                        <Text style={styles.menuModalTitle}>{selectedSubscription?.name}</Text>
-                        
-                        <TouchableOpacity style={styles.menuOption} onPress={fetchHistory}>
-                            <MaterialCommunityIcons name="history" size={24} color={colors.primary} />
-                            <Text style={styles.menuOptionText}>{t('viewHistory')}</Text>
-                        </TouchableOpacity>
-                        
-                        <TouchableOpacity 
-                            style={styles.menuOption} 
-                            onPress={() => { 
-                                setMenuVisible(false); 
-                                if (selectedSubscription) {
-                                    openModal(selectedSubscription); 
-                                }
-                            }}
-                        >
-                            <MaterialCommunityIcons name="check-circle-outline" size={24} color={colors.emerald500} />
-                            <Text style={styles.menuOptionText}>{t('markAsPaid')}</Text>
-                        </TouchableOpacity>
+                onClose={() => setMenuVisible(false)}
+                selectedSubscription={selectedSubscription}
+                onViewHistory={fetchHistory}
+                onMarkAsPaid={() => {
+                     setMenuVisible(false);
+                     if (selectedSubscription) {
+                         openModal(selectedSubscription);
+                     }
+                }}
+                onEdit={() => {
+                     if (selectedSubscription) {
+                         setMenuVisible(false);
+                         const sub = selectedSubscription;
+                         router.push({
+                             pathname: '/edit',
+                             params: {
+                                 id: sub.id,
+                                 name: sub.name,
+                                 amount: sub.amount,
+                                 frequency: sub.frequency,
+                                 nextPaymentDate: sub.next_payment_date,
+                                 isTrial: sub.isTrial,
+                                 trialEndDate: sub.trialEndDate,
+                                 categoryId: sub.categoryId,
+                                 reminderDaysBefore: sub.reminderDaysBefore,
+                                 reminderHour: sub.reminderHour,
+                                 reminderMinute: sub.reminderMinute,
+                                 cardName: sub.cardName,
+                                 language: language
+                             }
+                         });
+                     }
+                }}
+                onDelete={() => {
+                     if (selectedSubscription) {
+                         setMenuVisible(false);
+                         handleDelete(selectedSubscription.id);
+                     }
+                }}
+                language={language}
+            />
 
-                        <TouchableOpacity 
-                            style={styles.menuOption} 
-                            onPress={() => { 
-                                if (selectedSubscription) {
-                                    setMenuVisible(false);
-                                    const sub = selectedSubscription;
-                                    router.push({
-                                        pathname: '/edit',
-                                        params: {
-                                            id: sub.id,
-                                            name: sub.name,
-                                            amount: sub.amount,
-                                            frequency: sub.frequency,
-                                            nextPaymentDate: sub.next_payment_date,
-                                            isTrial: sub.isTrial,
-                                            trialEndDate: sub.trialEndDate,
-                                            categoryId: sub.categoryId,
-                                            reminderDaysBefore: sub.reminderDaysBefore,
-                                            reminderHour: sub.reminderHour,
-                                            reminderMinute: sub.reminderMinute,
-                                            cardName: sub.cardName,
-                                            language: language
-                                        }
-                                    });
-                                }
-                            }}
-                        >
-                            <MaterialCommunityIcons name="pencil" size={24} color={colors.slate400} />
-                            <Text style={styles.menuOptionText}>{t('edit')}</Text>
-                        </TouchableOpacity>
-
-                        <TouchableOpacity 
-                            style={[styles.menuOption, { borderBottomWidth: 0 }]} 
-                            onPress={() => { 
-                                if (selectedSubscription) {
-                                    setMenuVisible(false); 
-                                    handleDelete(selectedSubscription.id); 
-                                }
-                            }}
-                        >
-                            <MaterialCommunityIcons name="delete" size={24} color={colors.red500} />
-                            <Text style={[styles.menuOptionText, { color: colors.red500 }]}>{t('delete')}</Text>
-                        </TouchableOpacity>
-                    </View>
-                </TouchableOpacity>
-            </Modal>
-
-            {/* Payment History Modal */}
-            <Modal
-                animationType="slide"
-                transparent={true}
+            <HistoryModal 
                 visible={isHistoryVisible}
-                onRequestClose={() => setHistoryVisible(false)}
-            >
-                <View style={styles.historyModalOverlay}>
-                    <View style={styles.historyModalContainer}>
-                        <View style={styles.historyModalHeader}>
-                            <Text style={styles.historyModalTitle}>
-                                {isGlobalHistory ? t('paymentHistory') : t('paymentHistory')}
-                            </Text>
-                            <TouchableOpacity onPress={() => setHistoryVisible(false)}>
-                                <MaterialCommunityIcons name="close" size={24} color={colors.white} />
-                            </TouchableOpacity>
-                        </View>
-                        <View style={styles.historySubHeader}>
-                            <Text style={styles.historySubName}>
-                                {isGlobalHistory ? t('allSubscriptions') : selectedSubscription?.name}
-                            </Text>
-                        </View>
+                onClose={() => setHistoryVisible(false)}
+                isGlobalHistory={isGlobalHistory}
+                selectedSubscription={selectedSubscription}
+                paymentHistory={paymentHistory}
+                language={language}
+            />
 
-                        <ScrollView style={styles.historyList} showsVerticalScrollIndicator={false}>
-                            {paymentHistory.length === 0 ? (
-                                <View style={styles.emptyHistoryContainer}>
-                                    <MaterialCommunityIcons name="history" size={48} color={colors.slate700} />
-                                    <Text style={styles.emptyHistoryText}>{t('noPaymentHistory')}</Text>
-                                </View>
-                            ) : (
-                                paymentHistory.map((payment, index) => (
-                                    <View key={index} style={styles.historyItem}>
-                                        <View style={styles.historyItemLeft}>
-                                            <MaterialCommunityIcons name="calendar-check" size={20} color={colors.emerald500} />
-                                            <View style={{ marginLeft: 12 }}>
-                                                {isGlobalHistory && (
-                                                    <Text style={{ color: colors.white, fontWeight: 'bold', fontSize: 16, marginBottom: 4 }}>
-                                                        {payment.name}
-                                                    </Text>
-                                                )}
-                                                <Text style={[styles.historyDate, { marginLeft: 0 }]}>
-                                                    {format(new Date(payment.paymentDate), 'd MMMM yyyy', language === 'Turkish' ? { locale: tr } : {})}
-                                                </Text>
-                                            </View>
-                                        </View>
-                                        <Text style={styles.historyAmount}>{getCurrency(language)}{payment.amount.toFixed(2)}</Text>
-                                    </View>
-                                ))
-                            )}
-                        </ScrollView>
-                    </View>
-                </View>
-            </Modal>
-
-            <Modal
-                animationType="slide"
-                transparent={true}
+            <FilterModal 
                 visible={isFilterModalVisible}
-                onRequestClose={() => setFilterModalVisible(false)}
-            >
-                <View style={styles.filterModalOverlay}>
-                    <View style={styles.filterModalContainer}>
-                        <View style={styles.filterModalHeader}>
-                            <Text style={styles.filterModalTitle}>{t('filtersSettings')}</Text>
-                            <TouchableOpacity onPress={() => setFilterModalVisible(false)}>
-                                <MaterialCommunityIcons name="close" size={24} color={colors.white} />
-                            </TouchableOpacity>
-                        </View>
-
-                        <ScrollView style={styles.filterModalContent} showsVerticalScrollIndicator={false}>
-                            {/* Language Toggle */}
-                            <View style={styles.filterSection}>
-                                <Text style={styles.filterSectionTitle}>{t('language')}</Text>
-                                <View style={styles.languageToggleContainer}>
-                                    <TouchableOpacity 
-                                        style={[styles.languageToggleBtn, language === 'English' && styles.languageToggleBtnActive]}
-                                        onPress={() => setLanguage('English')}
-                                    >
-                                        <Text style={[styles.languageToggleText, language === 'English' && styles.languageToggleTextActive]}>
-                                            English
-                                        </Text>
-                                    </TouchableOpacity>
-                                    <TouchableOpacity 
-                                        style={[styles.languageToggleBtn, language === 'Turkish' && styles.languageToggleBtnActive]}
-                                        onPress={() => setLanguage('Turkish')}
-                                    >
-                                        <Text style={[styles.languageToggleText, language === 'Turkish' && styles.languageToggleTextActive]}>
-                                            Türkçe
-                                        </Text>
-                                    </TouchableOpacity>
-                                </View>
-                            </View>
-
-                            {/* Search */}
-                            <View style={styles.filterSection}>
-                                <Text style={styles.filterSectionTitle}>{t('search')}</Text>
-                                <View style={styles.filterSearchContainer}>
-                                    <MaterialCommunityIcons name="magnify" size={20} color={colors.slate400} style={styles.filterSearchIcon} />
-                                    <TextInput
-                                        style={styles.filterSearchInput}
-                                        placeholder={t('searchPlaceholder')}
-                                        placeholderTextColor={colors.slate500}
-                                        value={searchQuery}
-                                        onChangeText={setSearchQuery}
-                                    />
-                                    {searchQuery.length > 0 && (
-                                        <TouchableOpacity onPress={() => setSearchQuery('')}>
-                                            <MaterialCommunityIcons name="close-circle" size={18} color={colors.slate400} />
-                                        </TouchableOpacity>
-                                    )}
-                                </View>
-                            </View>
-
-                            {/* Category Filter */}
-                            <View style={styles.filterSection}>
-                                <Text style={styles.filterSectionTitle}>{t('categories')}</Text>
-                                <View style={styles.filterChipsContainer}>
-                                    {allCategories.map(category => {
-                                        const isSelected = selectedCategories.includes(category.name);
-                                        return (
-                                            <TouchableOpacity
-                                                key={category.id}
-                                                style={[styles.filterChip, isSelected && styles.filterChipActive]}
-                                                onPress={() => {
-                                                    if (isSelected) {
-                                                        setSelectedCategories(selectedCategories.filter(c => c !== category.name));
-                                                    } else {
-                                                        setSelectedCategories([...selectedCategories, category.name]);
-                                                    }
-                                                }}
-                                            >
-                                                <Text style={[styles.filterChipText, isSelected && styles.filterChipTextActive]}>
-                                                    {getCategoryTranslation(language, category.name)}
-                                                </Text>
-                                            </TouchableOpacity>
-                                        );
-                                    })}
-                                </View>
-                            </View>
-
-                            {/* Frequency Filter */}
-                            <View style={styles.filterSection}>
-                                <Text style={styles.filterSectionTitle}>{t('billingCycle')}</Text>
-                                <View style={styles.filterChipsContainer}>
-                                    {['Weekly', 'Monthly', 'Yearly'].map(freq => {
-                                        const isSelected = selectedFrequencies.includes(freq);
-                                        return (
-                                            <TouchableOpacity
-                                                key={freq}
-                                                style={[styles.filterChip, isSelected && styles.filterChipActive]}
-                                                onPress={() => {
-                                                    if (isSelected) {
-                                                        setSelectedFrequencies(selectedFrequencies.filter(f => f !== freq));
-                                                    } else {
-                                                        setSelectedFrequencies([...selectedFrequencies, freq]);
-                                                    }
-                                                }}
-                                            >
-                                                <Text style={[styles.filterChipText, isSelected && styles.filterChipTextActive]}>
-                                                    {t(freq.toLowerCase())}
-                                                </Text>
-                                            </TouchableOpacity>
-                                        );
-                                    })}
-                                </View>
-                            </View>
-                        </ScrollView>
-
-                        {/* Clear Filters Button */}
-                        <View style={styles.filterModalFooter}>
-                            <TouchableOpacity 
-                                style={styles.clearFiltersBtn}
-                                onPress={() => {
-                                    setSearchQuery('');
-                                    setSelectedCategories([]);
-                                    setSelectedFrequencies([]);
-                                }}
-                            >
-                                <Text style={styles.clearFiltersText}>{t('clearAllFilters')}</Text>
-                            </TouchableOpacity>
-                        </View>
-                    </View>
-                </View>
-            </Modal>
+                onClose={() => setFilterModalVisible(false)}
+                language={language}
+                setLanguage={setLanguage}
+                searchQuery={searchQuery}
+                setSearchQuery={setSearchQuery}
+                selectedCategories={selectedCategories}
+                setSelectedCategories={setSelectedCategories}
+                selectedFrequencies={selectedFrequencies}
+                setSelectedFrequencies={setSelectedFrequencies}
+                allCategories={allCategories}
+            />
 
             <View style={styles.header}>
                 <View style={styles.headerContent}>
@@ -829,6 +317,10 @@ export default function Index() {
                 data={filteredSubscriptions}
                 renderItem={renderItem}
                 keyExtractor={(item) => item.id.toString()}
+                initialNumToRender={10}
+                maxToRenderPerBatch={10}
+                windowSize={5}
+                removeClippedSubviews={true}
                 style={styles.main}
                 contentContainerStyle={{ paddingBottom: 120, flexGrow: 1 }}
                 ListHeaderComponent={<SummaryCard subscriptions={filteredSubscriptions} language={language} />}
