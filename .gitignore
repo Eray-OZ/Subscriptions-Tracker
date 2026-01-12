@@ -18,23 +18,6 @@ expo-env.d.ts
 *.key
 *.mobileprovision
 
-# Android
-android/app/build/
-android/build/
-android/.gradle/
-android/app/src/main/assets/
-android/app/src/main/res/drawable-mdpi/
-android/app/src/main/res/drawable-hdpi/
-android/app/src/main/res/drawable-xhdpi/
-android/app/src/main/res/drawable-xxhdpi/
-android/app/src/main/res/drawable-xxxhdpi/
-
-# iOS
-ios/Pods/
-ios/build/
-ios/*.xcworkspace
-ios/Podfile.lock
-
 # Metro
 .metro-health-check*
 
