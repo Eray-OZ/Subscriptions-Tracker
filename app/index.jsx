@@ -2,32 +2,49 @@ import { useState, useCallback, useMemo, useEffect } from "react";
 import { FlatList, Text, View, TouchableOpacity, Platform } from "react-native";
 import { Link, router } from "expo-router";
 import { useFocusEffect } from "@react-navigation/native";
-import { getSubscriptions, getCategories, deleteSubscription, addPaymentToHistory, updateSubscription, updateAmount, getPaymentHistoryBySubscription, getPaymentHistory } from "../src/db/database";
+import { getPaymentHistoryBySubscription, getPaymentHistory } from "../src/db/database";
 import { styles, colors } from "../src/styles/index.js";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { LinearGradient } from 'expo-linear-gradient';
 import { isBefore, format, differenceInCalendarDays } from 'date-fns';
 import { tr } from 'date-fns/locale';
-import { scheduleSubscriptionNotification, cancelSubscriptionNotification } from '../src/utils/notifications';
-import { updateWidgetData } from "../src/utils/widget";
-import { updateiOSWidget, calculateWidgetData } from "../src/utils/iosWidget";
 import { getTranslation, getCurrency, getCategoryTranslation } from '../src/translations';
 import { SubscriptionItem } from '../src/components/SubscriptionItem';
 import { PaymentModal, MenuModal, HistoryModal } from '../src/components/SubscriptionModals';
 import { FilterModal } from '../src/components/FilterModal';
-import { BrandIcon } from '../src/components/BrandIcon';
 import { SummaryCard } from '../src/components/SummaryCard';
+import { useSubscriptions } from '../src/hooks/useSubscriptions';
+import { useFilters } from '../src/hooks/useFilters';
 import { saveLanguage, loadLanguage } from '../src/utils/language';
-
-
-
-// Medium-dark, muted colors for cards
-import { gradients, getGradientForId, getIconForCategory, getStatusStyle } from '../src/utils/theme';
+// So I can remove lines 15 and 24 completely.
 
 
 export default function Index() {
-    const [subscriptions, setSubscriptions] = useState([]);
-    const [allCategories, setAllCategories] = useState([]);
+    const [language, setLanguage] = useState('Turkish');
+    
+    // Data & Actions Hooks
+    const { 
+        subscriptions, 
+        allCategories, 
+        loading, 
+        fetchSubscriptions, 
+        handleDelete: deleteSub, 
+        handleConfirmPayment: confirmPayment, 
+        handleUpdatePrice: updatePrice 
+    } = useSubscriptions(language);
+
+    // Filter Hook
+    const { 
+        searchQuery, 
+        setSearchQuery, 
+        selectedCategories, 
+        setSelectedCategories, 
+        selectedFrequencies, 
+        setSelectedFrequencies, 
+        filteredSubscriptions 
+    } = useFilters(subscriptions, language);
+
+    // UI State
     const [isModalVisible, setModalVisible] = useState(false);
     const [isFilterModalVisible, setFilterModalVisible] = useState(false);
     const [selectedSubscription, setSelectedSubscription] = useState(null);
@@ -43,50 +60,8 @@ export default function Index() {
     const [paymentHistory, setPaymentHistory] = useState([]);
     const [isGlobalHistory, setIsGlobalHistory] = useState(false);
     
-    // Filter states
-    const [searchQuery, setSearchQuery] = useState('');
-    const [selectedCategories, setSelectedCategories] = useState([]);
-    const [selectedFrequencies, setSelectedFrequencies] = useState([]);
-    const [language, setLanguage] = useState('Turkish');
-    
     // Translation helper
     const t = (key) => getTranslation(language, key);
-
-
-    const fetchSubscriptions = async () => {
-        try {
-            const data = await getSubscriptions();
-            setSubscriptions(data);
-            
-            // Get unique categories
-            const cats = await getCategories();
-            setAllCategories(cats);
-        } catch (error) {
-            console.error("Error fetching subscriptions", error);
-        }
-    };
-    
-    // Filtered subscriptions based on search and filters
-    const filteredSubscriptions = useMemo(() => {
-        return subscriptions.filter(sub => {
-            // Search filter
-            if (searchQuery && !sub.name.toLowerCase().includes(searchQuery.toLowerCase())) {
-                return false;
-            }
-            
-            // Category filter
-            if (selectedCategories.length > 0 && !selectedCategories.includes(sub.category_name)) {
-                return false;
-            }
-            
-            // Frequency filter
-            if (selectedFrequencies.length > 0 && !selectedFrequencies.includes(sub.frequency || 'Monthly')) {
-                return false;
-            }
-            
-            return true;
-        });
-    }, [subscriptions, searchQuery, selectedCategories, selectedFrequencies]);
 
 
     useFocusEffect(
@@ -96,18 +71,8 @@ export default function Index() {
             loadLanguage().then(savedLang => {
                 if (savedLang) setLanguage(savedLang);
             });
-        }, [])
+        }, [fetchSubscriptions])
     );
-
-    // Update widget data when subscriptions list or language changes
-    useEffect(() => {
-        // Always upate widget to ensure language/empty state is synced
-        // Android widget
-        updateWidgetData(subscriptions, language);
-        // iOS widget
-        const iosData = calculateWidgetData(subscriptions, language);
-        updateiOSWidget(iosData);
-    }, [subscriptions, language]);
 
     // Save language when it changes
     useEffect(() => {
@@ -115,13 +80,7 @@ export default function Index() {
     }, [language]);
 
     const handleDelete = async (id) => {
-        try {
-            await deleteSubscription(id);
-            await cancelSubscriptionNotification(id);
-            fetchSubscriptions();
-        } catch (error) {
-            console.error("Error deleting subscription", error);
-        }
+        await deleteSub(id);
     };
 
     const openModal = (subscription) => {
@@ -131,44 +90,18 @@ export default function Index() {
 
 
     const handlePrice = async (id) => {
-        await updateAmount(id, newPrice)
-        setIsEditing(false)
-        setEditingId(null)
-        setNewPrice('')
-        fetchSubscriptions()
+        await updatePrice(id, newPrice);
+        setIsEditing(false);
+        setEditingId(null);
+        setNewPrice('');
     }
 
     const handleConfirmPayment = async () => {
-        if (!selectedSubscription) {
-            return;
-        }
-        try {
-            const today = new Date();
-
-            await Promise.all([
-                addPaymentToHistory(
-                    selectedSubscription.id,
-                    selectedSubscription.name,
-                    selectedSubscription.amount,
-                    format(today, 'yyyy-MM-dd'),
-                    selectedSubscription.categoryId
-                ),
-                updateSubscription(selectedSubscription.id, format(newPaymentDate, 'yyyy-MM-dd'))
-            ]);
-
-            await scheduleSubscriptionNotification(
-                selectedSubscription.id, 
-                selectedSubscription.name, 
-                newPaymentDate,
-                selectedSubscription.reminderDaysBefore,
-                selectedSubscription.reminderHour,
-                selectedSubscription.reminderMinute
-            );
-
+        if (!selectedSubscription) return;
+        
+        const success = await confirmPayment(selectedSubscription, newPaymentDate);
+        if (success) {
             setModalVisible(false);
-            fetchSubscriptions();
-        } catch (error) {
-            console.error("Error confirming payment", error);
         }
     };
 
@@ -200,7 +133,7 @@ export default function Index() {
         setHistoryVisible(true);
     };
 
-    const renderItem = ({ item }) => (
+    const renderItem = useCallback(({ item }) => (
         <SubscriptionItem 
             item={item}
             language={language}
@@ -209,8 +142,14 @@ export default function Index() {
             editingId={editingId}
             newPrice={newPrice}
             setNewPrice={setNewPrice}
+            onSave={() => handlePrice(item.id)}
+            onCancel={() => {
+                setIsEditing(false);
+                setEditingId(null);
+                setNewPrice('');
+            }}
         />
-    );
+    ), [language, handleLongPress, isEditing, editingId, newPrice, handlePrice, setIsEditing, setEditingId, setNewPrice]);
 
     return (
         <View style={styles.container}>

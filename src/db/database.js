@@ -9,6 +9,9 @@ export const setupDatabase = async () => {
     CREATE TABLE IF NOT EXISTS Categories (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL UNIQUE);
     CREATE TABLE IF NOT EXISTS Subscriptions (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, amount REAL NOT NULL, nextPaymentDate DATE NOT NULL, categoryId INTEGER, frequency TEXT DEFAULT 'Monthly', isTrial INTEGER DEFAULT 0, trialEndDate DATE, FOREIGN KEY (categoryId) REFERENCES Categories (id));
     CREATE TABLE IF NOT EXISTS PaymentHistory (id INTEGER PRIMARY KEY AUTOINCREMENT, subscriptionId INTEGER, name TEXT NOT NULL, amount REAL NOT NULL, paymentDate DATE NOT NULL, categoryId INTEGER, FOREIGN KEY(subscriptionId) REFERENCES Subscriptions(id), FOREIGN KEY(categoryId) REFERENCES Categories(id));
+    
+    CREATE INDEX IF NOT EXISTS idx_subscriptions_next_payment ON Subscriptions(nextPaymentDate);
+    CREATE INDEX IF NOT EXISTS idx_payment_history_sub_id ON PaymentHistory(subscriptionId);
   `);
 
   // Migration for existing tables
@@ -147,4 +150,9 @@ export const deleteSubscription = async (subscriptionId) => {
   return db.runAsync(
     `DELETE FROM Subscriptions WHERE id=(?)`, [subscriptionId]
   )
+}
+
+export const executeTransaction = async (callback) => {
+  if (!db) throw new Error("Veritabanı henüz kurulmadı!");
+  return db.withTransactionAsync(callback);
 }

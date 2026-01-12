@@ -169,7 +169,11 @@ Visual overview of upcoming payments.
    - [x] Quick Actions
 
 3. **Phase 3** (Ecosystem)
+
    - [x] Home Screen Widget
+
+4. **Phase 4** (Visuals)
+   - [x] Calendar View
 
 ---
 

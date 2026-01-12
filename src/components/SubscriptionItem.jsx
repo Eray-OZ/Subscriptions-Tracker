@@ -8,14 +8,16 @@ import { getTranslation, getCurrency, getCategoryTranslation } from '../translat
 import { BrandIcon } from './BrandIcon';
 import { getGradientForId, getStatusStyle } from '../utils/theme';
 
-export const SubscriptionItem = ({ 
+const SubscriptionItemComponent = ({ 
     item, 
     language, 
     onLongPress, 
     isEditing, 
     editingId, 
     newPrice, 
-    setNewPrice 
+    setNewPrice,
+    onSave,
+    onCancel
 }) => {
     const t = (key) => getTranslation(language, key);
     const today = new Date();
@@ -56,18 +58,26 @@ export const SubscriptionItem = ({
                          ) : null}
                      </View>
                      
-                     {!isEditingThis ? (
+                    {!isEditingThis ? (
                          <Text style={{ fontSize: 24, fontWeight: '800', color: 'white', letterSpacing: -1 }}>
                             {getCurrency(language)}{item.amount.toFixed(2)}
                          </Text>
                      ) : (
-                        <TextInput
-                            style={styles.subscriptionAmountInput}
-                            value={newPrice}
-                            onChangeText={setNewPrice}
-                            keyboardType="numeric"
-                            autoFocus
-                        />
+                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                            <TextInput
+                                style={styles.subscriptionAmountInput}
+                                value={newPrice}
+                                onChangeText={setNewPrice}
+                                keyboardType="numeric"
+                                autoFocus
+                            />
+                            <TouchableOpacity onPress={onSave} style={{ backgroundColor: 'rgba(255,255,255,0.2)', padding: 4, borderRadius: 20 }}>
+                                <MaterialCommunityIcons name="check" size={20} color="white" />
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={onCancel} style={{ backgroundColor: 'rgba(255,255,255,0.2)', padding: 4, borderRadius: 20 }}>
+                                <MaterialCommunityIcons name="close" size={20} color="white" />
+                            </TouchableOpacity>
+                        </View>
                      )}
                 </View>
 
@@ -151,3 +161,5 @@ export const SubscriptionItem = ({
         </TouchableOpacity>
     );
 };
+
+export const SubscriptionItem = React.memo(SubscriptionItemComponent);

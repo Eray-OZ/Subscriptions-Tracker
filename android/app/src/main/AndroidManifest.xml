@@ -26,16 +26,8 @@
         <action android:name="android.intent.action.VIEW"/>
         <category android:name="android.intent.category.DEFAULT"/>
         <category android:name="android.intent.category.BROWSABLE"/>
-        <data android:scheme="subtracker"/>
         <data android:scheme="exp+subtracker"/>
       </intent-filter>
     </activity>
-    <receiver android:name=".widget.SubTrackerWidget" android:exported="false" android:label="SubTracker">
-      <intent-filter>
-        <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
-        <action android:name="com.erayoz.subtracker.UPDATE_WIDGET"/>
-      </intent-filter>
-      <meta-data android:name="android.appwidget.provider" android:resource="@xml/subtracker_widget_info"/>
-    </receiver>
   </application>
 </manifest>

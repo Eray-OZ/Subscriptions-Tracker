@@ -12,8 +12,24 @@
 - **Polished Android UI (Removed summary shadow, fixed red bar contrast)**
 - **Improved Card Interaction (Single tap now opens menu)**
 - **Fixed widget date localization (Pass 'tr'/'en' to native)**
-- **Optimized widget density & capacity (Up to 10 items, dynamic resizing)**
-- Verified widget data flow, resizing, and localization
+- **Refactored `useSubscriptions` and `useFilters` hooks**
+- **Added SQLite indexes for query performance**
+- **Memoized `SubscriptionItem` and `SummaryCard`**
+- **Cleaned up unused imports and `index.jsx`**
+- **Verified Calendar View implementation**
+- **Created Master Plan Index (`plans/PLANS.md`)**
+- **Verified Notification Reliability Strategy**
+- **Finalized All Optimization Plans**
+- **Built Release APK (New Architecture + Kotlin 2.0.21)**
+- **Fixed Android Widget row alignment (Fixed column widths)**
+- **Restored `scheme` in `app.json` (required for deep linking)**
+- **Optimized Repository Size (Updated `.gitignore` for build artifacts)**
+
+## Next Steps
+
+1. APK build and physical device testing
+2. Payment history screen logic (if further refinement needed)
+3. Customizable Icons & Colors (Future Phase)
 
 ## Next Steps
 

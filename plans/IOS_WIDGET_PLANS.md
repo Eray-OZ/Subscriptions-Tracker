@@ -12,8 +12,8 @@ Add a native iOS home screen widget using SwiftUI and WidgetKit that displays:
 ## Prerequisites
 
 - [x] Xcode installed
-- [ ] iOS Simulator runtime downloaded
-- [ ] Basic Swift/SwiftUI knowledge (I'll guide you)
+- [x] iOS Simulator runtime downloaded
+- [x] Basic Swift/SwiftUI knowledge (I'll guide you)
 
 ---
 
@@ -40,20 +40,20 @@ open ios/SubTracker.xcworkspace
 
 ### 2.1 Create Widget Target in Xcode
 
-1. File → New → Target
-2. Search for "Widget Extension"
-3. Name it: `SubTrackerWidget`
-4. Language: Swift
-5. Uncheck "Include Configuration App Intent" (we'll use static config)
+1. [x] File → New → Target
+2. [x] Search for "Widget Extension"
+3. [x] Name it: `SubTrackerWidget`
+4. [x] Language: Swift
+5. [x] Uncheck "Include Configuration App Intent" (we'll use static config)
 
 ### 2.2 Configure App Groups
 
 App Groups let the main app share data with the widget.
 
-1. Select main app target → Signing & Capabilities
-2. Add "App Groups" capability
-3. Create group: `group.com.yourname.subtracker`
-4. Add same App Group to widget target
+1. [x] Select main app target → Signing & Capabilities
+2. [x] Add "App Groups" capability
+3. [x] Create group: `group.com.erayoz.subtracker` (Updated to match code)
+4. [x] Add same App Group to widget target
 
 ---
 

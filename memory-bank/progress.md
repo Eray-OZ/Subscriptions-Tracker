@@ -11,13 +11,20 @@
 - **App Launch Sync**: Notifications rescheduled on startup
 - **Android Widget**: Native Kotlin widget fully implemented (UI, Data Flow, Resizing)
 - **Component Architecture**: Modular design with extracted components (Card, Item, Modals)
-- **Shared Utilities**: Centralized theme and translation logic
+- **Custom Hooks**: Refactored logic into `useSubscriptions` and `useFilters`
+- **Performance**: Database indexing and memoized components
+
+- **Calendar View**: Monthly overview with payment dots and daily details
+- **Notification Reliability**: Reschedule-on-launch strategy implemented
+- **Reliability Plans**: Documented in `plans/NOTIFICATION_RELIABILITY_PLANS.md`
+- **Plans Index**: Master index created at `plans/PLANS.md`
+- **Release Build**: Successful Production APK build (New Arch enabled)
+- **Repo Health**: Optimized `.gitignore` to exclude heavy build artifacts
 
 ## Pending 🔄
 
-- [ ] Implement Custom Hooks (useSubscriptions, useFilters)
 - [ ] Verify installation on physical device
-- [ ] Notification sound/vibration settings
+- [ ] Customizable Icons & Colors (Future)
 
 ## Known Issues ⚠️
 
@@ -30,6 +37,8 @@
 | Date       | Milestone                              |
 | ---------- | -------------------------------------- |
 | 2026-01-12 | Android environment setup completed    |
+| 2026-01-12 | Release APK built successfully         |
+| 2026-01-12 | Repository size optimized              |
 | 2026-01-12 | First successful Android build         |
 | 2026-01-12 | Kotlin updated to 2.0.20               |
 | 2026-01-12 | New Architecture enabled               |
