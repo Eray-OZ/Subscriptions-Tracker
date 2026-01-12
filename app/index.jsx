@@ -448,7 +448,10 @@ export default function Index() {
                                 marginTop: 4 
                             }}>
                                 <Text style={{ fontSize: 10, fontWeight: 'bold', color: 'white' }}>
-                                    {remainingDays} {t('daysLeft').toUpperCase()}
+                                    {remainingDays < 0 
+                                        ? `${Math.abs(remainingDays)} ${t('daysOverdue').toUpperCase()}`
+                                        : `${remainingDays} ${t('daysLeft').toUpperCase()}`
+                                    }
                                 </Text>
                             </View>
                         </View>

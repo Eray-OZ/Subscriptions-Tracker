@@ -24,6 +24,7 @@ export const translations = {
     
     // Subscription Card
     daysLeft: 'days left',
+    daysOverdue: 'days overdue',
     overdue: 'Overdue',
     confirmPayment: 'Confirm Payment',
     
@@ -115,6 +116,7 @@ export const translations = {
     
     // Subscription Card
     daysLeft: 'gün kaldı',
+    daysOverdue: 'gün gecikti',
     overdue: 'Gecikmiş',
     confirmPayment: 'Ödemeyi Onayla',
     
