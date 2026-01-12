@@ -26,7 +26,8 @@
       "favicon": "./assets/images/favicon.png"
     },
     "notification": {
-      "icon": "./assets/images/notification-icon.png"
+      "icon": "./assets/app-icon.png",
+      "color": "#1A1A3A"
     },
     "plugins": [
       "expo-router",
@@ -34,13 +35,10 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/splash-icon.png",
+          "image": "./assets/app-icon.png",
           "imageWidth": 200,
           "resizeMode": "contain",
-          "backgroundColor": "#ffffff",
-          "dark": {
-            "backgroundColor": "#000000"
-          }
+          "backgroundColor": "#050505"
         }
       ],
       "expo-sqlite",

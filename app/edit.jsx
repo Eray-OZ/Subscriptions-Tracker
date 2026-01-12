@@ -165,7 +165,7 @@ export default function EditScreen() {
                 </View>
 
                 <View style={styles.labelContainer}>
-                    <Text style={styles.labelText}>{t('amount')} ({t(frequency.toLowerCase())})</Text>
+                    <Text style={styles.labelText}>{t('amount')}</Text>
                     <TextInput
                         style={styles.input}
                         placeholder={getCurrency(language) + "9.99"}
@@ -187,14 +187,7 @@ export default function EditScreen() {
                     />
                 </View>
 
-                <View style={styles.labelContainer}>
-                    <Text style={styles.labelText}>{t('billingCycle')}</Text>
-                    <View style={styles.billingCycleContainer}>
-                        {renderFrequencyOption('Weekly')}
-                        {renderFrequencyOption('Monthly')}
-                        {renderFrequencyOption('Yearly')}
-                    </View>
-                </View>
+
                 
                 <View style={styles.labelContainer}>
                     <Text style={styles.labelText}>{t('remindMe')}</Text>

@@ -2,73 +2,40 @@
 
 ## 🚨 Critical Bugs
 
-### 1. Widget Missing in APK
+### 1. Widget Missing in APK ✅ FIXED
 
 **Issue:** User reports the Android widget is not appearing in the widget picker after installing the Release APK.
-**Potential Causes:**
-
-- `AndroidManifest.xml` issues (exported="false", missing intent filters).
-- ProGuard/R8 obfuscation stripping widget classes.
-- Launcher cache issues.
-
-**Action Plan:**
-
-- [ ] Check `AndroidManifest.xml` for `<receiver>` configuration.
-- [ ] Check `proguard-rules.pro` to ensure widget classes are kept.
-- [ ] Verify `exported="true"`.
+**Solution:** Added `<receiver>` tag to `AndroidManifest.xml` with correct intent filters and exported=true.
 
 ---
 
 ## 🛠 Feature Requests
 
-### 2. Sort Subscriptions by Date
+### 2. Sort Subscriptions by Date ✅ FIXED
 
 **Req:** Subscriptions should be sorted by "closest payment date" first (Top of list = Next to pay).
-**Current Behavior:** Likely sorted by ID or creation order.
-**Action Plan:**
+**Solution:** Implemented sorting in `useSubscriptions.js` by `next_payment_date`.
 
-- [ ] Update `app/index.jsx` or `useSubscriptions` hook to sort the list by `next_payment_date`.
-- [ ] Ensure `daysLeft` calculation is used for sorting.
+### 3. Redesign Summary Card ✅ FIXED
 
-### 3. Redesign Summary Card
-
-**Req:** "Change summary card feature but dont know what are we gonna do".
-**Current State:**
-
-- Shows Total/Monthly/Yearly toggle.
-- Shows a "Total Expenses" gradient card.
-  **Brainstorming Needed:**
-- Maybe show "Safe to Spend"?
-- Breakdown by Category?
-- Comparison to last month?
-  **Action Plan:**
-- [ ] Propose 3 alternative designs to the user.
+**Req:** Simplify Summary Card to show only essential info.
+**Solution:** Removed Weekly/Monthly/Yearly toggle. Now shows: Active Subs count, Highest Sub, Total monthly spend.
 
 ---
 
-### 4. Fix Default Expo Splash Screen
+### 4. Fix Default Expo Splash Screen ✅ FIXED
 
 **Issue:** User reports the default Expo loading animation is visible on startup in the release build.
-**Goal:** Ensure a seamless splash screen experience (custom icon/color only, no generic "Expo" spinner).
-**Action Plan:**
-
-- [ ] Check `app.json` splash configuration.
-- [ ] Verify `SplashScreen.preventAutoHideAsync()` usage in `_layout.jsx`.
-- [ ] Ensure `SplashScreen.hideAsync()` is called only when resources are ready.
+**Solution:** Changed `backgroundColor` from `#ffffff` (white) to `#050505` (dark) to match app theme.
 
 ---
 
 ---
 
-### 5. Fix Notification Icon
+### 5. Fix Notification Icon ✅ FIXED
 
 **Issue:** User reports the notification icon is the "old icon".
-**Cause:** Likely `app.json` pointing to an old asset or Android using the default fallback.
-**Action Plan:**
-
-- [ ] Check `app.json` `notification.icon` path.
-- [ ] Verify the image at `./assets/images/notification-icon.png` is the _new_ one.
-- [ ] If needed, separate "monochrome" icon for Android requirements.
+**Solution:** Changed `app.json` notification.icon path from `./assets/images/notification-icon.png` to `./assets/app-icon.png`.
 
 ---
 
