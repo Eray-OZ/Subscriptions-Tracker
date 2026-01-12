@@ -55,23 +55,6 @@
           }
         }
       ],
-      [
-        "react-native-android-widget",
-        {
-          "widgets": [
-            {
-              "name": "SubscriptionWidget",
-              "label": "Subscription Summary",
-              "minWidth": "250dp",
-              "minHeight": "100dp",
-              "description": "See your monthly spending and next payment.",
-              "previewImage": "./assets/app-icon.png",
-              "resizeMode": "horizontal|vertical",
-              "updatePeriodMillis": 3600000
-            }
-          ]
-        }
-      ],
       "@react-native-community/datetimepicker",
       "expo-web-browser",
       "expo-secure-store",
