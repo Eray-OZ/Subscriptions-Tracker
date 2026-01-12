@@ -33,6 +33,7 @@
     <receiver android:name=".widget.SubTrackerWidget" android:exported="false" android:label="SubTracker">
       <intent-filter>
         <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+        <action android:name="com.erayoz.subtracker.UPDATE_WIDGET"/>
       </intent-filter>
       <meta-data android:name="android.appwidget.provider" android:resource="@xml/subtracker_widget_info"/>
     </receiver>

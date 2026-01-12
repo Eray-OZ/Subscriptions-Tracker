@@ -26,13 +26,14 @@ class WidgetModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
         
         // Save to SharedPreferences (equivalent to iOS App Groups UserDefaults)
         val prefs = context.getSharedPreferences("SubTrackerWidget", Context.MODE_PRIVATE)
+        // Use commit() to write synchronously to disk to ensure data is available for widget immediately
         prefs.edit()
             .putString("widgetData", jsonString)
-            .apply()
+            .commit()
         
         // Trigger widget update broadcast
         val intent = Intent(context, SubTrackerWidget::class.java)
-        intent.action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
+        intent.action = "com.erayoz.subtracker.UPDATE_WIDGET"
         
         // Get all widget IDs
         val appWidgetManager = AppWidgetManager.getInstance(context)
